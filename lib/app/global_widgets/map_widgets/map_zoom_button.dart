@@ -43,16 +43,20 @@ class MapZoomButton extends StatelessWidget {
                 ),
                 onPressed: () {
                   iconData == Icons.add
-                      ? mapController.zoom + 1 <= 18.499
-                          ? mapController.move(
-                              mapController.center, mapController.zoom + 1)
-                          : mapController.move(
-                              mapController.center, mapController.zoom)
-                      : mapController.zoom - 1 >= 3
-                          ? mapController.move(
-                              mapController.center, mapController.zoom - 1)
-                          : mapController.move(
-                              mapController.center, mapController.zoom);
+                      ? customMapController.mapController.zoom + 1 <= 18.499
+                          ? customMapController.mapController.move(
+                              customMapController.mapController.center,
+                              customMapController.mapController.zoom + 1)
+                          : customMapController.mapController.move(
+                              customMapController.mapController.center,
+                              customMapController.mapController.zoom)
+                      : customMapController.mapController.zoom - 1 >= 3
+                          ? customMapController.mapController.move(
+                              customMapController.mapController.center,
+                              customMapController.mapController.zoom - 1)
+                          : customMapController.mapController.move(
+                              customMapController.mapController.center,
+                              customMapController.mapController.zoom);
                 },
               ),
             )

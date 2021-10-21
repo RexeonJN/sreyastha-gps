@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 
 import '/app/global_widgets/map_container.dart';
 import '/app/core/themes/colors.dart';
@@ -46,23 +47,27 @@ class HomeView extends GetView<HomeController> {
                 children: [
                   MapContainer(),
                   HomePageAppBar(_openDrawer),
-                  Center(
-                    child: Text(
-                        controller.currentLocation.value!.altitude.toString()),
-                  )
                 ],
               )
             : CircularProgressIndicator(),
       ),
       bottomNavigationBar: _bottomAppBar(context),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          customMapController.moveToCurrentLocation();
+        },
+        child: const Icon(Icons.gps_fixed, color: Colors.white),
+      ),
     );
   }
 
   /// This is the bottom navigation shown in the bottom of the home screen
-  BottomAppBar _bottomAppBar(BuildContext context) {
+  Widget _bottomAppBar(BuildContext context) {
     return BottomAppBar(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.07,
+        width: MediaQuery.of(context).size.width,
         color: light,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -84,7 +89,6 @@ class HomeView extends GetView<HomeController> {
               .toList(),
         ),
       ),
-      elevation: 3,
     );
   }
 }
