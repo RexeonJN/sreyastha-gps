@@ -1,50 +1,90 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:latlong2/latlong.dart';
 
+import '/app/global_widgets/map_container.dart';
+import '/app/core/themes/colors.dart';
+import '/app/global_widgets/drawer_widgets/side_menu.dart';
+import '../widgets/custom_app_bar.dart';
 import '../controllers/home_controller.dart';
 
+enum Actions { marker, track, route }
+
+class IconNavigate {
+  final IconData? icon;
+  final void Function()? onPressed;
+  final Color color;
+
+  IconNavigate(this.icon, this.color, this.onPressed);
+}
+
+///Home view contains the main screen in which there are buttons to navigate
+///to the marker page, track page and route page
+///Only this screen contains the drawer. All the other screens doesnt contain
+///the drawer or the bottom navigation bar.
+
 class HomeView extends GetView<HomeController> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
+  void _openDrawer() {
+    _scaffoldKey.currentState!.openDrawer();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Obx(
-        () => Center(
-          child: controller.currentLocation.value != null
-              ? Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      controller.currentLocation.value!.location.toString(),
-                    ),
-                    Text(
-                      "Altitude " +
-                          controller.currentLocation.value!.altitude.toString(),
-                    ),
-                    Text(
-                      "Accuracy " +
-                          controller.currentLocation.value!.accuracy.toString(),
-                    ),
-                    Text(
-                      "Heading " +
-                          controller.currentLocation.value!.heading.toString(),
-                    ),
-                    Text(
-                      "Speed Accuracy " +
-                          controller.currentLocation.value!.speedAccuracy
-                              .toString(),
-                    ),
-                    Text(
-                      "Speed " +
-                          controller.currentLocation.value!.speed.toString(),
-                    ),
-                    Text(
-                      controller.currentLocation.value!.timestamp.toString(),
-                    ),
-                  ],
-                )
-              : Container(),
+      key: _scaffoldKey,
+      extendBodyBehindAppBar: true,
+      drawer: Drawer(
+        child: SideNav(
+          scaffoldKey: _scaffoldKey,
         ),
       ),
+      body: Obx(
+        () => controller.currentLocation.value != null
+            ? Stack(
+                children: [
+                  MapContainer(),
+                  HomePageAppBar(_openDrawer),
+                  Center(
+                    child: Text(
+                        controller.currentLocation.value!.altitude.toString()),
+                  )
+                ],
+              )
+            : CircularProgressIndicator(),
+      ),
+      bottomNavigationBar: _bottomAppBar(context),
+    );
+  }
+
+  /// This is the bottom navigation shown in the bottom of the home screen
+  BottomAppBar _bottomAppBar(BuildContext context) {
+    return BottomAppBar(
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.07,
+        color: light,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            IconNavigate(Icons.save, active, () {}),
+            IconNavigate(Icons.settings, active, () {}),
+            IconNavigate(Icons.person, active, () {}),
+
+            /// this is present only to create an even distribution of buttons.
+            /// in its place a floating action button will be shown.
+            IconNavigate(Icons.settings, light, () {}),
+          ]
+              .map(
+                (icon) => IconButton(
+                  onPressed: icon.onPressed,
+                  icon: Icon(icon.icon, color: icon.color),
+                ),
+              )
+              .toList(),
+        ),
+      ),
+      elevation: 3,
     );
   }
 }
