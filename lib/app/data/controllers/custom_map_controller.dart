@@ -1,12 +1,12 @@
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart' show Geolocator;
+import 'package:geolocator/geolocator.dart' show Geolocator, Position;
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 
 class CustomMapController extends GetxController {
   static CustomMapController instance = Get.find();
-  MapController mapController = MapController();
+  MapController _mapController = MapController();
   //variable to show the distance in the horizontal distance bar
   Rx<double> _longitudinalDistanceShown = Rx<double>(0);
 
@@ -22,11 +22,14 @@ class CustomMapController extends GetxController {
       ///earlier i used rebuild to again build the home page but
       ///future also works
       Future.delayed(Duration(seconds: 1)).then(
-        (_) => _setDistance(),
+        (_) {
+          _setDistance();
+          moveToCurrentLocation();
+        },
       );
     } else {
-      if (mapController.bounds != null &&
-          mapController.bounds!.northEast != null) _setDistance();
+      if (_mapController.bounds != null &&
+          _mapController.bounds!.northEast != null) _setDistance();
       update();
     }
   }
@@ -39,10 +42,10 @@ class CustomMapController extends GetxController {
 
   void _setDistance() {
     _longitudinalDistanceShown.value = Geolocator.distanceBetween(
-      mapController.bounds!.northWest.latitude,
-      mapController.bounds!.northWest.longitude,
-      mapController.bounds!.northEast!.latitude,
-      mapController.bounds!.northEast!.longitude,
+      _mapController.bounds!.northWest.latitude,
+      _mapController.bounds!.northWest.longitude,
+      _mapController.bounds!.northEast!.latitude,
+      _mapController.bounds!.northEast!.longitude,
     );
   }
 
@@ -57,7 +60,16 @@ class CustomMapController extends GetxController {
 
   void moveTheMap({LatLng? location}) {
     if (location != null) {
-      mapController.move(LatLng(location.latitude, location.longitude), 16.0);
+      _mapController.move(LatLng(location.latitude, location.longitude), 16.0);
     }
+  }
+
+  MapController get mapController {
+    return _mapController;
+  }
+
+  ///get the current position from location Controller
+  Position? get currentPosition {
+    return locationController.currentPosition;
   }
 }

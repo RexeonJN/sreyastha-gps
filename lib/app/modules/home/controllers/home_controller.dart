@@ -24,6 +24,11 @@ class HomeController extends GetxController {
     return locationController.currentLocation;
   }
 
+  ///this is to keep views free from global controllers
+  void moveToCurrentLocation() {
+    customMapController.moveToCurrentLocation();
+  }
+
   @override
   void onReady() {
     super.onReady();

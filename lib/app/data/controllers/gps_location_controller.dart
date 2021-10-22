@@ -25,6 +25,9 @@ class GpsLocationController extends GetxController {
   bool _isSubscribed = false;
 
   final Rx<LatlngData?> currentLocation = Rx<LatlngData?>(null);
+
+  ///position object of the current location
+  Position? _currentPosition;
   final Rx<LocationServiceStatus> currentServiceStatus =
       Rx<LocationServiceStatus>(LocationServiceStatus.unknown);
 
@@ -52,6 +55,7 @@ class GpsLocationController extends GetxController {
         Geolocator.getPositionStream(desiredAccuracy: locationAccuracy).listen(
             (Position ld) {
       _isSubscribed = true;
+      _currentPosition = ld;
       currentLocation.value = LatlngData(
         location: LatLng(ld.latitude, ld.longitude),
         accuracy: ld.accuracy,
@@ -86,5 +90,9 @@ class GpsLocationController extends GetxController {
   void onClose() {
     _onLocationChangedSub?.cancel();
     super.onClose();
+  }
+
+  Position? get currentPosition {
+    return _currentPosition;
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 
 import '/app/global_widgets/map_container.dart';
 import '/app/core/themes/colors.dart';
@@ -54,8 +52,11 @@ class HomeView extends GetView<HomeController> {
       bottomNavigationBar: _bottomAppBar(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
       floatingActionButton: FloatingActionButton(
+        ///if there are more than two floating action buttons then there is a
+        ///conflict in the hero tag
+        heroTag: null,
         onPressed: () {
-          customMapController.moveToCurrentLocation();
+          controller.moveToCurrentLocation();
         },
         child: const Icon(Icons.gps_fixed, color: Colors.white),
       ),
