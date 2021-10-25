@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 import '/app/core/themes/colors.dart';
 
 class HomePageAppBar extends StatelessWidget {
   final Function _openDrawer;
+
   HomePageAppBar(this._openDrawer, {Key? key}) : super(key: key);
 
   @override
@@ -76,6 +80,7 @@ class HomePageAppBar extends StatelessWidget {
           onTap: () {
             switch (_action) {
               case "Marker":
+                Get.toNamed(Routes.ADD_MARKER);
                 break;
               case "Route":
                 break;

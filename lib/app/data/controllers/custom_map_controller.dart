@@ -4,11 +4,13 @@ import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 
-class CustomMapController extends GetxController {
-  static CustomMapController instance = Get.find();
-  MapController _mapController = MapController();
+class CustomMapController {
+  Function toUpdateUI;
+  CustomMapController({required this.toUpdateUI});
+
   //variable to show the distance in the horizontal distance bar
   Rx<double> _longitudinalDistanceShown = Rx<double>(0);
+  MapController _mapController = MapController();
 
   bool _firstLoad =
       true; //to stop changeDistance from calling setState during first build
@@ -21,7 +23,7 @@ class CustomMapController extends GetxController {
       ///to change the value of longitudinal value from 0 to some value
       ///earlier i used rebuild to again build the home page but
       ///future also works
-      Future.delayed(Duration(seconds: 1)).then(
+      Future.delayed(Duration(milliseconds: 100)).then(
         (_) {
           _setDistance();
           moveToCurrentLocation();
@@ -30,7 +32,7 @@ class CustomMapController extends GetxController {
     } else {
       if (_mapController.bounds != null &&
           _mapController.bounds!.northEast != null) _setDistance();
-      update();
+      toUpdateUI();
     }
   }
 
@@ -71,5 +73,10 @@ class CustomMapController extends GetxController {
   ///get the current position from location Controller
   Position? get currentPosition {
     return locationController.currentPosition;
+  }
+
+  ///during transition _firstload needs to be set to true
+  void setReload() {
+    _firstLoad = true;
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 import '/app/global_widgets/map_container.dart';
 import '/app/core/themes/colors.dart';
@@ -43,11 +44,11 @@ class HomeView extends GetView<HomeController> {
         () => controller.currentLocation.value != null
             ? Stack(
                 children: [
-                  MapContainer(),
+                  MapContainer(controller),
                   HomePageAppBar(_openDrawer),
                 ],
               )
-            : CircularProgressIndicator(),
+            : Center(child: CircularProgressIndicator()),
       ),
       bottomNavigationBar: _bottomAppBar(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.miniEndDocked,
@@ -74,7 +75,9 @@ class HomeView extends GetView<HomeController> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconNavigate(Icons.save, active, () {}),
-            IconNavigate(Icons.settings, active, () {}),
+            IconNavigate(Icons.settings, active, () {
+              Get.toNamed(Routes.SETTINGS);
+            }),
             IconNavigate(Icons.person, active, () {}),
 
             /// this is present only to create an even distribution of buttons.

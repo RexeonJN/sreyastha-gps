@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sreyastha_gps/app/core/constants/controllers.dart';
+
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
 
 class HorizontalDistanceBar extends StatelessWidget {
-  const HorizontalDistanceBar({
+  final Function getController;
+  HorizontalDistanceBar(
+    this.getController, {
     required BoxConstraints constraints,
     Key? key,
   })  : _constraints = constraints,
@@ -28,9 +30,9 @@ class HorizontalDistanceBar extends StatelessWidget {
               child: Center(
                 child: Obx(
                   () => Text(
-                    customMapController.longitudinalDistanceShown.value > 1000
-                        ? '${(customMapController.longitudinalDistanceShown.value / 1000).toStringAsFixed(2)}  km'
-                        : '${customMapController.longitudinalDistanceShown.value.toStringAsFixed(2)} m',
+                    getController().longitudinalDistanceShown.value > 1000
+                        ? '${(getController().longitudinalDistanceShown.value / 1000).toStringAsFixed(2)}  km'
+                        : '${getController().longitudinalDistanceShown.value.toStringAsFixed(2)} m',
                     textScaleFactor: 1.2,
                     style: TextStyle(
                       color: dark,

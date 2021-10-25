@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-import '/app/core/constants/controllers.dart';
 import '/app/core/themes/colors.dart';
 
 ///this is the button shown in the map in each of the map screen
 
 class MapZoomButton extends StatelessWidget {
-  const MapZoomButton({Key? key}) : super(key: key);
+  final Function getController;
+  const MapZoomButton(this.getController, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,20 +43,20 @@ class MapZoomButton extends StatelessWidget {
                 ),
                 onPressed: () {
                   iconData == Icons.add
-                      ? customMapController.mapController.zoom + 1 <= 18.499
-                          ? customMapController.mapController.move(
-                              customMapController.mapController.center,
-                              customMapController.mapController.zoom + 1)
-                          : customMapController.mapController.move(
-                              customMapController.mapController.center,
-                              customMapController.mapController.zoom)
-                      : customMapController.mapController.zoom - 1 >= 3
-                          ? customMapController.mapController.move(
-                              customMapController.mapController.center,
-                              customMapController.mapController.zoom - 1)
-                          : customMapController.mapController.move(
-                              customMapController.mapController.center,
-                              customMapController.mapController.zoom);
+                      ? getController().mapController.zoom + 1 <= 18.499
+                          ? getController().mapController.move(
+                              getController().mapController.center,
+                              getController().mapController.zoom + 1)
+                          : getController().mapController.move(
+                              getController().mapController.center,
+                              getController().mapController.zoom)
+                      : getController().mapController.zoom - 1 >= 3
+                          ? getController().mapController.move(
+                              getController().mapController.center,
+                              getController().mapController.zoom - 1)
+                          : getController().mapController.move(
+                              getController().mapController.center,
+                              getController().mapController.zoom);
                 },
               ),
             )
