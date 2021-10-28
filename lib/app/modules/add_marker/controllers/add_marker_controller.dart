@@ -3,16 +3,14 @@ import 'package:geolocator/geolocator.dart' show LocationAccuracy;
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
-import 'package:sreyastha_gps/app/data/controllers/custom_map_controller.dart';
+import 'package:sreyastha_gps/app/data/controllers/non_getx_controllers/custom_map_controller.dart';
+import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 import 'package:sreyastha_gps/app/data/models/latlng_data.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_item.dart';
-import 'package:sreyastha_gps/app/modules/add_marker/models/marker_list.dart';
 
 class AddMarkerController extends GetxController {
   CustomMapController? _customMapController;
 
-  ///a marker list is instantiated to hold all the markers in a list
-  MarkerList markerList = MarkerList();
   @override
   void onInit() {
     super.onInit();
@@ -26,38 +24,39 @@ class AddMarkerController extends GetxController {
   ///the controller. If the markerList is directly passed to the map container
   ///then it will be a new instance and will not be connected to the controller.
   Rx<List<Marker>> provideMarkerList() {
-    return markerList.markerList;
+    return storageController.markerList.markerList;
   }
 
   ///get selected marker
   MarkerItem? getSelectedMarkerItem() {
-    return markerList.selectedItemMarker;
+    return storageController.markerList.selectedItemMarker;
   }
 
   ///a function to perform the CRUD operation with the selected marker
-  dynamic operateOnMarker(
-      String mode, LatLng? markerPoint, Function? onTapped) {
+  dynamic operateOnMarker(String mode, LatLng? markerPoint, Function? onTapped,
+      MarkerItem? markerItem, MarkerType? markerType) {
     switch (mode) {
       case "create":
-        if (markerPoint != null) markerList.addMarker(markerPoint, onTapped);
+        if (markerPoint != null && markerType != null)
+          storageController.markerList
+              .addMarker(markerPoint, onTapped, markerType);
         break;
       case "read":
 
         /// data related to selected marker should be handled from here
-        if (markerList.selectedItemMarker != null) {
-          print(markerList.selectedItemMarker!.id);
-          print(markerList.selectedItemMarker!.location);
+        if (storageController.markerList.selectedItemMarker != null) {
+          print(storageController.markerList.selectedItemMarker!.id);
+          print(storageController.markerList.selectedItemMarker!.location);
         }
         break;
       case "update":
-
-        ///TODO the update behaviour
+        //if (markerItem != null) markerList.updateMarker(markerItem);
         break;
       case "delete":
-        markerList.deleteMarker();
+        storageController.markerList.deleteMarker();
         break;
       case "resetItem":
-        markerList.changeSelectedItem(null);
+        storageController.markerList.changeSelectedItem(null);
         break;
     }
   }

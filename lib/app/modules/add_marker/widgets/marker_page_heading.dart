@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
-import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 class MarkerPageHeading extends StatelessWidget {
   const MarkerPageHeading({
@@ -40,7 +39,7 @@ class MarkerPageHeading extends StatelessWidget {
                       ]),
                   child: InkWell(
                     onTap: () {
-                      if (Get.previousRoute == Routes.HOME) Get.back();
+                      Get.back();
                     },
                     child: Row(
                       children: [

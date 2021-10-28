@@ -2,20 +2,20 @@ import 'package:latlong2/latlong.dart';
 
 class LatlngData {
   final LatLng location;
-  final double accuracy;
-  final double altitude;
-  final double speed;
-  final double speedAccuracy;
-  final double heading;
-  final DateTime? timestamp;
+  double? accuracy;
+  double? altitude;
+  double? speed;
+  double? speedAccuracy;
+  double? heading;
+  final DateTime timestamp;
 
   LatlngData({
     required this.location,
-    required this.accuracy,
-    required this.altitude,
-    required this.speed,
-    required this.speedAccuracy,
-    required this.heading,
+    this.accuracy,
+    this.altitude,
+    this.speed,
+    this.speedAccuracy,
+    this.heading,
     required this.timestamp,
   });
 }

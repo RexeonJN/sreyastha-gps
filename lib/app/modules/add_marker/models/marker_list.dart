@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
+import 'package:sreyastha_gps/app/data/models/latlng_data.dart';
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 import 'marker_item.dart';
@@ -10,7 +12,9 @@ class MarkerList {
   final Rx<Map<int, MarkerItem?>> _markerList = Rx<Map<int, MarkerItem?>>({});
 
   ///counter to provide an id for the marker
-  int counter = 1;
+  int _counter = 1;
+
+  int get counter => _counter;
 
   ///this attribute can be skipped and is only present as a temporary container
   ///during the addition of the marker.
@@ -27,7 +31,8 @@ class MarkerList {
   }
 
   ///default look of a marker selected on the map
-  Marker _defaultMarker(LatLng markerPoint, int id, Function? onTapped) {
+  Marker _defaultMarker(
+      LatLng markerPoint, int id, Function? onTapped, MarkerType markerType) {
     return Marker(
       height: 25,
       width: 25,
@@ -45,7 +50,7 @@ class MarkerList {
         child: Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.white,
+            color: getColor(markerType),
             boxShadow: [
               BoxShadow(
                   color: Colors.grey,
@@ -60,14 +65,20 @@ class MarkerList {
   }
 
   ///a function to "create" the marker
-  void addMarker(LatLng markerPoint, Function? onTapped) {
+  void addMarker(
+      LatLng markerPoint, Function? onTapped, MarkerType markerType) {
     markerItem = MarkerItem(
-        id: counter,
-        name: 'Mark' + (counter).toString(),
-        marker: _defaultMarker(markerPoint, counter, onTapped),
-        location: markerPoint);
+      id: _counter,
+      name: 'Mark' + (_counter).toString(),
+      marker: _defaultMarker(markerPoint, _counter, onTapped, markerType),
+      location: LatlngData(
+        location: markerPoint,
+        timestamp: DateTime.now(),
+      ),
+      markerType: markerType,
+    );
     _markerList.value.putIfAbsent(markerItem!.id, () => markerItem);
-    counter++;
+    _counter++;
   }
 
   ///"read" the details of the selected marker
@@ -78,10 +89,8 @@ class MarkerList {
         : null;
   }
 
-  ///a function to "update" the details of the selected marker
-  void updateMarker(String name) {
-    _markerList.value[selectedItem.value]!.name = name;
-  }
+  ///update marker is not required because the marker item passed to the
+  ///location marker controller is same as the selected marker item
 
   ///a function to "delete" the marker
   ///Since the id is unique and gets deleted, therefore, the selected value
@@ -96,5 +105,14 @@ class MarkerList {
         Rx(_markerList.value.values.map((e) => e!.marker).toList());
 
     return _listOfMarkers;
+  }
+
+  ///function to get the list of all marker item as a list which can be saved
+  ///later in csv
+  List<List<dynamic>> get markerListAsList {
+    return _markerList.value.values
+        .where((element) => element != null)
+        .map((e) => e!.listOfAttributes)
+        .toList();
   }
 }

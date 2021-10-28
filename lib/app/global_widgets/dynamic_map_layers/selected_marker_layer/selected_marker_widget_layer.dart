@@ -44,7 +44,7 @@ class SelectedMarkerWidget extends StatelessWidget {
                     color: active,
                   ),
                   onPressed: () async {
-                    await updateFunction();
+                    updateFunction();
                   },
                 ),
                 IconButton(

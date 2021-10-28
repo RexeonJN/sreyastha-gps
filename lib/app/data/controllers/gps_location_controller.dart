@@ -63,7 +63,7 @@ class GpsLocationController extends GetxController {
         heading: ld.heading,
         speed: ld.speed,
         speedAccuracy: ld.speedAccuracy,
-        timestamp: ld.timestamp,
+        timestamp: DateTime.now(),
       );
     }, onError: (Object error) {
       if (error is LocationServiceDisabledException) {

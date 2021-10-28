@@ -3,8 +3,13 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
+//import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 import 'package:sreyastha_gps/app/global_widgets/dynamic_map_layers/selected_marker_layer/selected_marker_widget_layer.dart';
+
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_item.dart';
+import 'package:sreyastha_gps/app/modules/add_marker/widgets/enter_location_button.dart';
+import 'package:sreyastha_gps/app/modules/add_marker/widgets/forms/input_location.dart';
 
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
@@ -31,7 +36,11 @@ class MapContainer extends StatefulWidget {
   final Rx<List<Marker>> Function()? markerList;
 
   ///a function to perform CRUD operation with selected marker
-  final Function(String, LatLng?, Function?)? operateOnMarker;
+  final Function(String, LatLng?, Function?, MarkerItem?, MarkerType?)?
+      operateOnMarker;
+
+  ///a function to change the selected marker item
+  final Function? changeSelectedItem;
 
   ///get selected marker
   final MarkerItem? Function()? getSelectedMarker;
@@ -41,6 +50,7 @@ class MapContainer extends StatefulWidget {
     this.markerList,
     this.operateOnMarker,
     this.getSelectedMarker,
+    this.changeSelectedItem,
     Key? key,
   }) : super(key: key);
 
@@ -49,6 +59,58 @@ class MapContainer extends StatefulWidget {
 }
 
 class _MapContainerState extends State<MapContainer> {
+  ///this function is passed as an update function to the input location form
+  ///depending upon the type some of the features will be shown or hidden
+  void _updateFunction(BuildContext context) async {
+    await showDialog(
+        context: context,
+        builder: (context) {
+          return LocationMarkerInput(
+            markerItem: widget.getSelectedMarker!()!,
+            updateMarker: (markerItem) {
+              //widget.operateOnMarker!("update", null, null, markerItem);
+              //setState(() {});
+            },
+            //markerType: markerType,
+          );
+        }).then((value) {
+      if (widget.getSelectedMarker != null &&
+          widget.getSelectedMarker!() != null)
+        setState(() {
+          /// this deletes the marker if the alert dialog was popped up
+          /// without entering any value
+          setState(() {
+            if (widget.getSelectedMarker != null &&
+                widget.getSelectedMarker!() != null &&
+                widget.getSelectedMarker!()!.location.location.latitude ==
+                    -90.0)
+              widget.operateOnMarker!("delete", null, null, null, null);
+          });
+
+          ///this removes the selected marker widget shown after the pop
+          ///is removed
+          widget.operateOnMarker!("resetItem", null, null, null, null);
+        });
+    });
+  }
+
+  ///function to manually mark location ont he map
+  void _manuallyEnterLocation() {
+    if (widget.operateOnMarker != null)
+      widget.operateOnMarker!("create", LatLng(-90, 0), () {
+        ///there is not need to update the markerlist on the map because after
+        ///its creation a pop up has to open
+        setState(() {});
+      }, null, MarkerType.enterLocation);
+
+    ///id of the last marker will be counter -1 as the counter increases
+    ///after the creation of marker
+    if (widget.changeSelectedItem != null) widget.changeSelectedItem!();
+
+    if (widget.getSelectedMarker != null && widget.getSelectedMarker!() != null)
+      _updateFunction(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -82,9 +144,9 @@ class _MapContainerState extends State<MapContainer> {
                   setState(() {
                     ///operate on marker and the getselected marker are passed
                     ///by the same add marker page
-                    widget.operateOnMarker!("resetItem", null, null);
+                    widget.operateOnMarker!(
+                        "resetItem", null, null, null, null);
                   });
-                ;
               },
               onLongPress: (position, markerPoint) {
                 if (widget.operateOnMarker != null) {
@@ -95,7 +157,7 @@ class _MapContainerState extends State<MapContainer> {
                       ///this function is executed whenever the marker selected
                       ///on the map is tapped
                       setState(() {});
-                    });
+                    }, null, MarkerType.markOnMap);
                   });
                 }
               },
@@ -144,17 +206,24 @@ class _MapContainerState extends State<MapContainer> {
                     Marker(
                       width: 200,
                       height: 40,
-                      point: widget.getSelectedMarker!()!.location,
+                      point: widget.getSelectedMarker!()!.location.location,
                       builder: (ctx) => SelectedMarkerWidget(
                         markerItem: widget.getSelectedMarker!()!,
                         deleteFunction: () {
                           setState(() {
                             if (widget.getSelectedMarker != null &&
                                 widget.getSelectedMarker!() != null)
-                              widget.operateOnMarker!("delete", null, null);
+                              widget.operateOnMarker!(
+                                  "delete", null, null, null, null);
                           });
                         },
-                        updateFunction: () {},
+                        updateFunction: () {
+                          ///this will update both marker details and UI
+
+                          if (widget.getSelectedMarker != null &&
+                              widget.getSelectedMarker!() != null)
+                            _updateFunction(context);
+                        },
                       ),
                     ),
                 ])
@@ -169,6 +238,13 @@ class _MapContainerState extends State<MapContainer> {
             widget.controller.customMapController,
             constraints: constraints,
           ),
+
+          ///this is a button to enter the location manually which will
+          /// eventually be marked on the map
+          if (Get.currentRoute == Routes.ADD_MARKER)
+            EnterLocationButton(
+              locationFunction: _manuallyEnterLocation,
+            ),
         ],
       ),
     );

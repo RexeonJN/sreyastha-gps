@@ -1,6 +1,6 @@
 import 'package:geolocator/geolocator.dart' show LocationAccuracy;
 import 'package:get/get.dart';
-import 'package:sreyastha_gps/app/data/controllers/custom_map_controller.dart';
+import 'package:sreyastha_gps/app/data/controllers/non_getx_controllers/custom_map_controller.dart';
 
 import '/app/core/constants/controllers.dart';
 import '/app/data/models/latlng_data.dart';
