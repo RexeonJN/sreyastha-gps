@@ -31,3 +31,16 @@ Color getColor(MarkerType markerType) {
       return Colors.white;
   }
 }
+
+MarkerType getMarkerType(String type) {
+  switch (type) {
+    case "Marked on Map":
+      return MarkerType.markOnMap;
+    case "current location was marked":
+      return MarkerType.getCurrentLocation;
+    case "Manually given Location":
+      return MarkerType.enterLocation;
+    default:
+      return MarkerType.markOnMap;
+  }
+}

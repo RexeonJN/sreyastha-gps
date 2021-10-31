@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 //import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 import 'package:sreyastha_gps/app/global_widgets/dynamic_map_layers/selected_marker_layer/selected_marker_widget_layer.dart';
@@ -245,6 +246,22 @@ class _MapContainerState extends State<MapContainer> {
             EnterLocationButton(
               locationFunction: _manuallyEnterLocation,
             ),
+          if (Get.currentRoute == Routes.ADD_MARKER)
+
+            ///button to delete all markers from the map
+            Positioned(
+                bottom: 250,
+                right: 20,
+                child: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () {
+                    setState(() {
+                      storageController.clearAllMarkers();
+                      Future.delayed(Duration(seconds: 5)).then(
+                          (value) => storageController.fetchMarkersFromCsv());
+                    });
+                  },
+                ))
         ],
       ),
     );

@@ -30,6 +30,12 @@ class MarkerList {
     selectedItem.value = id;
   }
 
+  ///function to delete all the markers from the marker list
+  void deleteAllMarker() {
+    _markerList.value = {};
+    _counter = 1;
+  }
+
   ///default look of a marker selected on the map
   Marker _defaultMarker(
       LatLng markerPoint, int id, Function? onTapped, MarkerType markerType) {
@@ -64,7 +70,7 @@ class MarkerList {
     );
   }
 
-  ///a function to "create" the marker
+  ///a function to "create" the marker directly from the map
   void addMarker(
       LatLng markerPoint, Function? onTapped, MarkerType markerType) {
     markerItem = MarkerItem(
@@ -77,6 +83,27 @@ class MarkerList {
       ),
       markerType: markerType,
     );
+    _markerList.value.putIfAbsent(markerItem!.id, () => markerItem);
+    _counter++;
+  }
+
+  ///A function to create marker from the list
+  void createMarkerFromList(List<String> data) {
+    markerItem = markerItem!.createMarkerItem(
+      data,
+      _counter,
+      _defaultMarker(
+        LatLng(
+          double.parse(data[1]),
+          double.parse(data[2]),
+        ),
+        _counter,
+        //the on tap function needs to be implemented
+        () {},
+        getMarkerType(data[7]),
+      ),
+    );
+    //adding the marker item in the markerlist
     _markerList.value.putIfAbsent(markerItem!.id, () => markerItem);
     _counter++;
   }
@@ -109,7 +136,7 @@ class MarkerList {
 
   ///function to get the list of all marker item as a list which can be saved
   ///later in csv
-  List<List<dynamic>> get markerListAsList {
+  List<List<String>> get markerListAsList {
     return _markerList.value.values
         .where((element) => element != null)
         .map((e) => e!.listOfAttributes)
