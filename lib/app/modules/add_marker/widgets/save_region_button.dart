@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sreyastha_gps/app/core/constants/all_files.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
+import 'package:sreyastha_gps/app/data/models/file_details.dart';
 
 class SaveRegionButton extends StatelessWidget {
   SaveRegionButton({
@@ -12,11 +14,43 @@ class SaveRegionButton extends StatelessWidget {
   final Rx<String> fileName = "".obs;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  ///if the form is validated, then it will save the file and get all data in
+  ///filename variable. The name of the variable is used to store the file in
+  ///the desired location
   void _saveFile(BuildContext context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       print(fileName.value);
       Navigator.of(context).pop();
+
+      ///check whether the filename already exists or not. If it exits
+      /// then it gives user a chance to either skip it or override it
+      final allSavedRegions = ALL_FILES['Markers']!.values;
+      for (FileDetails singleFile in allSavedRegions) {
+        if (fileName == singleFile.filename) {
+          showDialog(
+            context: context,
+            builder: (context) =>
+                AlertDialog(content: Text("Filename already exists"), actions: [
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                  storageController.saveAllMarkers(fileName.value);
+                },
+                child: Text("Override it"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                },
+                child: Text("Edit another name"),
+              ),
+            ]),
+          );
+          return;
+        }
+      }
+      print("overriden");
       storageController.saveAllMarkers(fileName.value);
     }
   }
@@ -37,7 +71,7 @@ class SaveRegionButton extends StatelessWidget {
                 child: TextFormField(
                   decoration: InputDecoration(
                       hintText: "Salt_Lake_City",
-                      labelText: "Name of the region",
+                      labelText: "Name of the region/file",
                       errorStyle: TextStyle(color: Colors.red)),
                   validator: (value) {
                     if (value == null || value.isEmpty)
@@ -45,7 +79,7 @@ class SaveRegionButton extends StatelessWidget {
                     if (value.contains(" "))
                       return "Seperate names using - or _";
                     if (value.length >= 20)
-                      return "Dont mention detailed file/region";
+                      return "Dont keep large file/region name";
                     return null;
                   },
                   onSaved: (value) {
@@ -55,6 +89,13 @@ class SaveRegionButton extends StatelessWidget {
               ),
             ),
             actions: [
+              TextButton(
+                onPressed: () {},
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
               TextButton(
                 onPressed: () => _saveFile(context),
                 child: Container(

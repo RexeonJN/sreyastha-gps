@@ -27,7 +27,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         scaffoldBackgroundColor: light,
         primaryColor: light,
-        accentColor: active,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         textTheme: GoogleFonts.mulishTextTheme(Theme.of(context).textTheme)
             .apply(bodyColor: dark),

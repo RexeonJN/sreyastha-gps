@@ -1,10 +1,14 @@
 import 'package:get/get.dart';
 
 class SettingsController extends GetxController {
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  ///this is used to navigate to the concerned tab depending upon which index
+  ///is required to be viewed
+  final Rx<int> currentIndex = 0.obs;
+
+  ///changes the index of the tab
+  void changeIndex(int index) {
+    currentIndex.value = index;
+    update();
   }
 
   @override
@@ -14,5 +18,4 @@ class SettingsController extends GetxController {
 
   @override
   void onClose() {}
-  void increment() => count.value++;
 }

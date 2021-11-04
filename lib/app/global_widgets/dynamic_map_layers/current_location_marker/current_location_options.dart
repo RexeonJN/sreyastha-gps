@@ -6,7 +6,7 @@ typedef CurrentLocationMarkerBuilder = Marker Function(
     BuildContext context, Position ld);
 
 class CurrentLocationOptions extends LayerOptions {
-  final void Function(Position?)? onLocationUpdate;
+  final void Function()? onLocationUpdate;
   final Duration updateInterval;
   final CurrentLocationMarkerBuilder? markerBuilder;
   final LocationAccuracy locationAccuracy;

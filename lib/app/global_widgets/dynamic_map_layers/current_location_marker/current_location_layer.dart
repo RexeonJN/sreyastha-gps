@@ -101,6 +101,7 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
         child: Stack(
       children: [
         Obx(() {
+          widget.options.onLocationUpdate!.call();
           if (locationController.currentLocation.value == null)
             return Container();
           final Marker? marker = locationController.currentPosition != null

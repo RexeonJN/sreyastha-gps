@@ -32,25 +32,27 @@ class AddMarkerController extends GetxController {
     return storageController.markerList.selectedItemMarker;
   }
 
-  ///a function to perform the CRUD operation with the selected marker
-  dynamic operateOnMarker(String mode, LatLng? markerPoint, Function? onTapped,
-      MarkerItem? markerItem, MarkerType? markerType) {
+  ///a function to perform the CRUD and all other operation related to
+  ///selected marker and markerlist
+  ///
+  ///mode:it chooses which operation to perform
+  ///markerPoint, markerType, onTapped and altitude: are required to create
+  ///marker
+  ///
+  dynamic operateOnMarker(String mode,
+      {LatLng? markerPoint,
+      Function? onTapped,
+      MarkerType? markerType,
+      double? altitude}) {
     switch (mode) {
       case "create":
         if (markerPoint != null && markerType != null)
           storageController.markerList
-              .addMarker(markerPoint, onTapped, markerType);
+              .addMarker(markerPoint, onTapped, markerType, altitude);
         break;
-      case "read":
-
-        /// data related to selected marker should be handled from here
-        if (storageController.markerList.selectedItemMarker != null) {
-          print(storageController.markerList.selectedItemMarker!.id);
-          print(storageController.markerList.selectedItemMarker!.location);
-        }
-        break;
-      case "update":
-        //if (markerItem != null) markerList.updateMarker(markerItem);
+      case "changeSelectedItem":
+        storageController.markerList
+            .changeSelectedItem(storageController.markerList.counter - 1);
         break;
       case "delete":
         storageController.markerList.deleteMarker();

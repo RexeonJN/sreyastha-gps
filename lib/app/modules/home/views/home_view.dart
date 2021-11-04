@@ -44,7 +44,10 @@ class HomeView extends GetView<HomeController> {
         () => controller.currentLocation.value != null
             ? Stack(
                 children: [
-                  MapContainer(controller),
+                  MapContainer(
+                    controller,
+                    routeType: "Home",
+                  ),
                   HomePageAppBar(_openDrawer),
                 ],
               )
@@ -55,6 +58,7 @@ class HomeView extends GetView<HomeController> {
       floatingActionButton: FloatingActionButton(
         ///if there are more than two floating action buttons then there is a
         ///conflict in the hero tag
+        backgroundColor: active,
         heroTag: null,
         onPressed: () {
           controller.moveToCurrentLocation();
@@ -74,9 +78,11 @@ class HomeView extends GetView<HomeController> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            IconNavigate(Icons.save, active, () {}),
+            IconNavigate(Icons.save, active, () {
+              Get.toNamed(Routes.SAVED, arguments: 0);
+            }),
             IconNavigate(Icons.settings, active, () {
-              Get.toNamed(Routes.SETTINGS);
+              Get.toNamed(Routes.SETTINGS, arguments: 0);
             }),
             IconNavigate(Icons.person, active, () {}),
 

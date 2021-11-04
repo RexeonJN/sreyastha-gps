@@ -71,8 +71,8 @@ class MarkerList {
   }
 
   ///a function to "create" the marker directly from the map
-  void addMarker(
-      LatLng markerPoint, Function? onTapped, MarkerType markerType) {
+  void addMarker(LatLng markerPoint, Function? onTapped, MarkerType markerType,
+      double? altitude) {
     markerItem = MarkerItem(
       id: _counter,
       name: 'Mark' + (_counter).toString(),
@@ -80,6 +80,7 @@ class MarkerList {
       location: LatlngData(
         location: markerPoint,
         timestamp: DateTime.now(),
+        altitude: altitude,
       ),
       markerType: markerType,
     );

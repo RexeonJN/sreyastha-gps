@@ -10,7 +10,6 @@ class LocationMarkerInput extends StatelessWidget {
   LocationMarkerInput(
       { //required this.markerType,
       required this.markerItem,
-      required this.updateMarker,
       Key? key})
       : super(key: key);
 
@@ -21,16 +20,13 @@ class LocationMarkerInput extends StatelessWidget {
   ///To change the style of the form, we need to know the type of marker input
   //final MarkerType markerType;
 
-  ///this function will update the marker in the marker list
-  final Function(MarkerItem) updateMarker;
-
   @override
   Widget build(BuildContext context) {
     ///form contains all the input data associated with the marker
     return GetX<LocationMarkerController>(
       init: LocationMarkerController(
-          editedMarkerItem: Rx<MarkerItem>(markerItem),
-          updateMarker: updateMarker),
+        editedMarkerItem: Rx<MarkerItem>(markerItem),
+      ),
       builder: (controller) => AlertDialog(
         content: Padding(
           padding: EdgeInsets.all(16.0),
@@ -50,8 +46,6 @@ class LocationMarkerInput extends StatelessWidget {
                     textInputAction: TextInputAction.next,
                     initialValue: controller.editedMarkerItem.value.name,
                     validator: (value) {
-                      ///TODO: remember to check whether the name of the
-                      ///marker is unique or not
                       if (value == null || value.isEmpty) {
                         return "Name cannot be left empty";
                       }
@@ -82,13 +76,9 @@ class LocationMarkerInput extends StatelessWidget {
                           ),
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.number,
-                          initialValue:
-                              controller.editedMarkerItem.value.markerType ==
-                                      MarkerType.enterLocation
-                                  ? ""
-                                  : controller.editedMarkerItem.value.location
-                                      .location.latitude
-                                      .toStringAsFixed(6),
+                          initialValue: controller
+                              .editedMarkerItem.value.location.location.latitude
+                              .toStringAsFixed(6),
                           validator: (latitude) {
                             if (latitude == null || latitude.isEmpty)
                               return "cannot be empty";
@@ -120,7 +110,6 @@ class LocationMarkerInput extends StatelessWidget {
                       Expanded(
                         child: TextFormField(
                           ///disables the input area
-                          //enabled: markerType == MarkerType.enterLocation,
                           enabled:
                               controller.editedMarkerItem.value.markerType ==
                                   MarkerType.enterLocation,
@@ -151,20 +140,47 @@ class LocationMarkerInput extends StatelessWidget {
                           ),
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.number,
-                          initialValue:
-                              controller.editedMarkerItem.value.markerType ==
-                                      MarkerType.enterLocation
-                                  ? ""
-                                  : controller.editedMarkerItem.value.location
-                                      .location.longitude
-                                      .toStringAsFixed(6),
+                          initialValue: controller.editedMarkerItem.value
+                              .location.location.longitude
+                              .toStringAsFixed(6),
                           onFieldSubmitted: (value) {
                             FocusScope.of(context)
-                                .requestFocus(controller.descriptionFocusNode);
+                                .requestFocus(controller.altitudeFocusNode);
                           },
                         ),
                       ),
                     ],
+                  ),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      errorStyle: TextStyle(color: Colors.red),
+                      hintText: "-20",
+                      labelText: "Enter altitude",
+                    ),
+                    enabled: controller.editedMarkerItem.value.markerType !=
+                        MarkerType.markOnMap,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.number,
+                    focusNode: controller.altitudeFocusNode,
+                    initialValue: controller
+                        .editedMarkerItem.value.location.altitude
+                        .toString(),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Enter the altitude";
+                      }
+                    },
+                    onFieldSubmitted: (value) {
+                      ///move to latitude input field
+                      FocusScope.of(context)
+                          .requestFocus(controller.descriptionFocusNode);
+                    },
+                    onSaved: (altitude) {
+                      if (controller.editedMarkerItem.value.markerType !=
+                          MarkerType.markOnMap)
+                        controller.editedMarkerItem.value.location.altitude =
+                            double.parse(altitude!);
+                    },
                   ),
                   TextFormField(
                     decoration: InputDecoration(

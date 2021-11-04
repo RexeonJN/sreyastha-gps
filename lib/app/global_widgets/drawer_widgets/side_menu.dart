@@ -54,10 +54,15 @@ class _SideNavState extends State<SideNav> {
                       child: Row(
                         children: [
                           AuthenticationButton(
-                              constraints: constraints, displayText: "Login"),
+                            constraints: constraints,
+                            displayText: "Login",
+                          ),
                           Spacer(),
                           AuthenticationButton(
-                              constraints: constraints, displayText: "Sign Up"),
+                            constraints: constraints,
+                            displayText: "Sign Up",
+                            signup: true,
+                          ),
                         ],
                       ),
                     ),

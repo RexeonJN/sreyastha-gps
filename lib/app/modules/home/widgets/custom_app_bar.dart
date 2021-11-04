@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sreyastha_gps/app/data/enums/feature.dart';
 
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
@@ -28,9 +29,8 @@ class HomePageAppBar extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 20.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: ["Marker", "Track", "Route"]
-                  .map((act) => _selectAction(act))
-                  .toList(),
+              children:
+                  getListOfFeatures().map((act) => _selectAction(act)).toList(),
             ),
           )
         ],
