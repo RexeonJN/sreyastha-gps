@@ -85,10 +85,13 @@ class HomePageAppBar extends StatelessWidget {
               case "Route":
                 break;
               case "Track":
+                Get.toNamed(Routes.ADD_TRACK);
                 break;
             }
           },
-          child: Text("Add " + _action),
+          child: _action != "Marker"
+              ? Text("Add " + _action)
+              : Text("Save Location"),
         ),
         backgroundColor: light,
         elevation: 2,

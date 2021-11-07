@@ -7,12 +7,14 @@ import 'package:sreyastha_gps/app/modules/saved/controllers/saved_controller.dar
 import 'package:sreyastha_gps/app/modules/saved/widgets/file_card.dart';
 
 class CustomSavedList extends GetView<SavedController> {
-  const CustomSavedList({Key? key}) : super(key: key);
+  CustomSavedList({required this.fileType, Key? key}) : super(key: key);
+
+  final String fileType;
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: ALL_FILES["Markers"]!
+      children: ALL_FILES[fileType]!
           .values
           .map(
             (specificFile) => Container(
@@ -24,6 +26,7 @@ class CustomSavedList extends GetView<SavedController> {
                   height: MediaQuery.of(context).size.height * 0.15,
                   child: FileCard(
                     fileDetails: specificFile,
+                    fileType: fileType,
                   ),
                 ),
               ),

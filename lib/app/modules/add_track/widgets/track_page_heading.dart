@@ -1,11 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
 import 'package:sreyastha_gps/app/data/enums/interval_type.dart';
 
 class TrackPageHeading extends StatelessWidget {
-  const TrackPageHeading({Key? key}) : super(key: key);
+  TrackPageHeading({required this.trackRecording, Key? key}) : super(key: key);
+
+  final Rx<bool> Function() trackRecording;
+
+  ///pop up to avaoid changing of interval during recording
+  void _preventIntervalChangeDuringTracking(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text("The interval can not be changed during the tracking."),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              padding: EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: active,
+              ),
+              child: Text(
+                "Okay",
+                style: GoogleFonts.poppins(color: light),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,16 +92,22 @@ class TrackPageHeading extends StatelessWidget {
                   itemBuilder: (context) {
                     return <PopupMenuEntry<IntervalType>>[
                       PopupMenuItem(
-                        child: Text("By Time"),
+                        child: Text(intervalAsStrings(IntervalType.ByTime)),
                         value: IntervalType.ByTime,
                       ),
                       PopupMenuItem(
-                        child: Text("By Distance"),
+                        child: Text(intervalAsStrings(IntervalType.ByDistance)),
                         value: IntervalType.ByDistance,
                       ),
                     ];
                   },
-                  onSelected: (value) {},
+                  onSelected: (value) {
+                    ///allow changing of interval only when there is no recording
+                    ///going on
+                    !trackRecording().value
+                        ? storageController.trackItem.setInterval(value)
+                        : _preventIntervalChangeDuringTracking(context);
+                  },
                 )
               ],
             ),

@@ -36,19 +36,20 @@ class AddMarkerController extends GetxController {
   ///selected marker and markerlist
   ///
   ///mode:it chooses which operation to perform
-  ///markerPoint, markerType, onTapped and altitude: are required to create
+  ///markerPoint, markerType, onTapped, accuracy and  altitude: are required to create
   ///marker
   ///
   dynamic operateOnMarker(String mode,
       {LatLng? markerPoint,
       Function? onTapped,
       MarkerType? markerType,
-      double? altitude}) {
+      double? altitude,
+      double? accuracy}) {
     switch (mode) {
       case "create":
         if (markerPoint != null && markerType != null)
           storageController.markerList
-              .addMarker(markerPoint, onTapped, markerType, altitude);
+              .addMarker(markerPoint, onTapped, markerType, altitude, accuracy);
         break;
       case "changeSelectedItem":
         storageController.markerList
@@ -60,6 +61,8 @@ class AddMarkerController extends GetxController {
       case "resetItem":
         storageController.markerList.changeSelectedItem(null);
         break;
+      case "clearAll":
+        storageController.clearAllMarkers();
     }
   }
 

@@ -28,22 +28,27 @@ class MarkerItem {
         this.name,
         this.location.location.latitude.toStringAsFixed(6),
         this.location.location.longitude.toStringAsFixed(6),
-        this.location.altitude != null ? this.location.altitude.toString() : "",
+        this.location.accuracy.toString(),
+        this.location.altitude != null
+            ? this.location.altitude.toString()
+            : "0",
         "${this.location.timestamp.year}-${this.location.timestamp.month}-${this.location.timestamp.day}",
         "${this.location.timestamp.hour}-${this.location.timestamp.minute}-${this.location.timestamp.second}",
         this.description != null ? this.description! : "Nill",
-        asStrings(this.markerType),
+        markerAsStrings(this.markerType),
       ];
 
   ///convert a row in csv to a markerItem object
   MarkerItem createMarkerItem(List<String> data, int id, Marker marker) {
-    final List<String> date = data[4].split('-');
-    final List<String> time = data[5].split('-');
+    final List<String> date = data[5].split('-');
+    final List<String> time = data[6].split('-');
     return MarkerItem(
       id: id,
       name: data[0],
       marker: marker,
       location: LatlngData(
+        altitude: data[4] == '0' ? 0 : double.parse(data[4]),
+        accuracy: double.tryParse(data[3]),
         location: LatLng(
           double.parse(data[1]),
           double.parse(data[2]),
@@ -56,7 +61,8 @@ class MarkerItem {
             int.parse(time[1]),
             int.parse(time[2])),
       ),
-      markerType: getMarkerType(data[7]),
+      markerType: getMarkerType(data[8]),
+      description: data[7],
     );
   }
 
@@ -64,6 +70,7 @@ class MarkerItem {
         "Name",
         "Latitude",
         "Longitude",
+        "Accuracy",
         "Altitude",
         "Date",
         "Time",

@@ -46,9 +46,15 @@ class SavedView extends GetView<SavedController> {
           ),
           body: TabBarView(
             children: [
-              CustomSavedList(),
-              Container(),
-              Container(),
+              CustomSavedList(
+                fileType: "Markers",
+              ),
+              CustomSavedList(
+                fileType: "Routes",
+              ),
+              CustomSavedList(
+                fileType: "Tracks",
+              ),
             ],
           )),
     );

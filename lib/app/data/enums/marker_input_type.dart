@@ -6,7 +6,7 @@ enum MarkerType {
   markOnMap,
 }
 
-String asStrings(MarkerType markerType) {
+String markerAsStrings(MarkerType markerType) {
   switch (markerType) {
     case MarkerType.markOnMap:
       return "Marked on Map";

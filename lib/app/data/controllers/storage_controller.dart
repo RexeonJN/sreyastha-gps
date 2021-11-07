@@ -10,6 +10,7 @@ import 'package:sreyastha_gps/app/core/constants/all_files.dart';
 import 'package:sreyastha_gps/app/data/enums/feature.dart';
 import 'package:sreyastha_gps/app/data/models/file_details.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_list.dart';
+import 'package:sreyastha_gps/app/modules/add_track/models/track_item.dart';
 
 class StorageController extends GetxController {
   static StorageController instance = Get.find();
@@ -18,6 +19,8 @@ class StorageController extends GetxController {
   ///instead of creating it in add marker controller, we are creating it in
   ///storage controller because it can be accessed by entire app
   MarkerList markerList = MarkerList();
+
+  TrackItem trackItem = TrackItem();
 
   ///Directories to be accessed by the app
   Directory? mainDirectory;
@@ -89,9 +92,8 @@ class StorageController extends GetxController {
     }
   }
 
-  ///A function to convert all data to csv format
-  String convertAllMarkerAsCsv(
-      List<String> columnNames, List<List<String>> values) {
+  ///A function to convert all marker data to csv format
+  String convertToCsv(List<String> columnNames, List<List<String>> values) {
     ///create List of List of strings which will eventually be converted to csv
     ///Data
     List<List<String>> rawData = [];
@@ -109,7 +111,7 @@ class StorageController extends GetxController {
     /// which is stored in the markerlist
     ///with its help we are naming the columns in our csv
     //////here we are expanding all the remaining marker data
-    String csvMarkerData = convertAllMarkerAsCsv(
+    String csvMarkerData = convertToCsv(
         markerList.markerItem!.nameOfAttributes, markerList.markerListAsList);
 
     ///save the file to the marker folder
@@ -184,10 +186,94 @@ class StorageController extends GetxController {
       }
       return Future.value(true);
     } catch (e) {
-      print("file cant be opened");
-
       ALL_FILES["Markers"]!.removeWhere((key, value) => key == path);
       return Future.value(false);
     }
   }
+
+  ///storage functions related to the track items
+
+  ///Given a file name save the file in local storage. Here trackDirectory will
+  ///be used
+  void saveTrack(String filename) async {
+    ///we are naming the columns in our csv
+    ///we are converting all the latlngdata to information to store in csv
+    String csvTrackData = convertToCsv(
+        trackItem.nameOfAttributes, trackItem.trackItemValuesAsList);
+
+    ///save the file to the marker folder
+    final finalPath = trackDirectory!.path + "/$filename.csv";
+
+    try {
+      ///Create a file in the given path and write all data in the file
+      final File? file = File(finalPath);
+      file!.writeAsString(csvTrackData);
+
+      ///add the track in the file_lists
+      ALL_FILES["Tracks"]!.putIfAbsent(
+        finalPath,
+        () => FileDetails(
+          filename: filename,
+          created: DateTime.now(),
+          feature: Feature.Track,
+          path: finalPath,
+        ),
+      );
+      print(ALL_FILES);
+    } catch (e) {}
+  }
+
+  ///Given a file name load the csv file from the storage
+  ///A function to read all markers from a csv
+  Future<bool> fetchTrackFromCsv({required String filename}) {
+    return loadingCsvDataForTrack(trackDirectory!.path + "/$filename.csv");
+  }
+
+  ///To display the csv data we need to convert the csv into a list
+  ///csv to list and then plot it
+  Future<bool> loadingCsvDataForTrack(String path) async {
+    ///open read creates a new stream of data for the csv
+    Stream<List<int>> csvFile;
+
+    ///check whether the filename already exists. If it exists
+    ///then load it else display a pop up that it is not present
+
+    try {
+      csvFile = new File(path).openRead();
+
+      ///the data is first converted to a string and then it is converted to
+      ///list
+      List<List<dynamic>> allTrackCsvList = await csvFile
+          .transform(utf8.decoder)
+          .transform(new CsvToListConverter())
+          .toList();
+
+      ///checking whether the heading column is of the same format as required
+      for (String item in trackItem.nameOfAttributes) {
+        if (!allTrackCsvList[0].contains(item)) {
+          print("is not compatible");
+        }
+      }
+
+      ///starting from the second row start creating a marker list from the
+      ///given file
+
+      for (int i = 1; i < allTrackCsvList.length; i++) {
+        List<String> tempList = [];
+        for (int j = 0; j < allTrackCsvList[i].length; j++) {
+          tempList.add(allTrackCsvList[i][j].toString());
+        }
+        trackItem.createTrackFromList(tempList);
+        update();
+      }
+      return Future.value(true);
+    } catch (e) {
+      print(e);
+      ALL_FILES["Tracks"]!.removeWhere((key, value) => key == path);
+      return Future.value(false);
+    }
+  }
+
+  ///there is no need of delete all tracks function as only one track will be
+  ///shown at a time
 }

@@ -101,6 +101,8 @@ class _CurrentLocationLayerState extends State<CurrentLocationLayer>
         child: Stack(
       children: [
         Obx(() {
+          ///whenever a new value of current location then onLocationUpdate
+          ///is called which calls setState
           widget.options.onLocationUpdate!.call();
           if (locationController.currentLocation.value == null)
             return Container();

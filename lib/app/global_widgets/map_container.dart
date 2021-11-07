@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 import 'package:sreyastha_gps/app/global_widgets/dynamic_map_layers/selected_marker_layer/selected_marker_widget_layer.dart';
 
@@ -10,6 +9,7 @@ import 'package:sreyastha_gps/app/modules/add_marker/models/marker_item.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/widgets/current_location_marker_button.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/widgets/enter_location_button.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/widgets/forms/input_location.dart';
+import 'package:sreyastha_gps/app/modules/add_track/widgets/tracking_button.dart';
 
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
@@ -30,6 +30,9 @@ class MapContainer extends StatefulWidget {
   ///However, it will only have methods which dont have any data associated with it
   final dynamic obtainedController;
 
+  ///screen type this is used in place of get.currentroute
+  final String routeType;
+
   ///a getter method is used to get the value of the markerList
   ///if it were a List of markers then it wont update whenever a new marker was
   ///added by controller
@@ -45,21 +48,30 @@ class MapContainer extends StatefulWidget {
     Function? onTapped,
     MarkerType? markerType,
     double? altitude,
+    double? accuracy,
   })? operateOnMarker;
 
   ///get selected marker
   ///this also provides a marker item so is not under operate on marker
   final MarkerItem? Function()? getSelectedMarker;
 
-  ///screen type this is used in place of get.currentroute
-  final String routeType;
+  ///a getter method is used to get the value of the polyline
+  final Rx<List<LatLng>> Function()? polylineList;
+
+  ///to get the status of recording of track
+  final Rx<bool> Function()? trackRecording;
+
+  final Function(String)? operateOnTrack;
 
   MapContainer(
     this.obtainedController, {
-    this.markerList,
-    this.operateOnMarker,
-    this.getSelectedMarker,
     required this.routeType,
+    this.getSelectedMarker,
+    this.operateOnMarker,
+    this.markerList,
+    this.trackRecording,
+    this.polylineList,
+    this.operateOnTrack,
     Key? key,
   }) : super(key: key);
 
@@ -68,6 +80,8 @@ class MapContainer extends StatefulWidget {
 }
 
 class _MapContainerState extends State<MapContainer> {
+  ///below are functions related to marker widget
+  ///
   ///this function is passed as an update function to the input location form
   ///depending upon the type some of the features will be shown or hidden
   void updateFunction(BuildContext context) async {
@@ -118,25 +132,51 @@ class _MapContainerState extends State<MapContainer> {
   ///to mark current location as the marker
   void currentLocationAsMarker() {
     if (widget.operateOnMarker != null &&
-        locationController.currentLocation.value != null) {
+        widget.obtainedController.currentLocation.value != null) {
       setState(() {
         ///updates the markerlist with the current location as marker
         widget.operateOnMarker!("create",
-            markerPoint: locationController.currentLocation.value!.location,
-            onTapped: () {
+            markerPoint: widget.obtainedController.currentLocation.value!
+                .location, onTapped: () {
           ///this function is executed whenever the marker selected
           ///on the map is tapped
           setState(() {});
         },
             markerType: MarkerType.getCurrentLocation,
-            altitude: locationController.currentLocation.value!.altitude);
+            altitude: widget.obtainedController.currentLocation.value!.altitude,
+            accuracy:
+                widget.obtainedController.currentLocation.value!.accuracy);
       });
     }
   }
 
   void deleteAllMarker() {
     setState(() {
-      storageController.clearAllMarkers();
+      if (widget.operateOnMarker != null) widget.operateOnMarker!("clearAll");
+    });
+  }
+
+  ///below are the function related to tracks
+  ///
+  ///function to start and end tracking of a track item
+  void startTracking() {
+    if (widget.operateOnTrack != null)
+      setState(() {
+        widget.operateOnTrack!("startTrack");
+      });
+  }
+
+  void endTracking() {
+    if (widget.operateOnTrack != null)
+      setState(() {
+        widget.operateOnTrack!("endTrack");
+      });
+  }
+
+  ///function to delete the track item which is currently shown on the map
+  void deleteTrack() {
+    setState(() {
+      if (widget.operateOnTrack != null) widget.operateOnTrack!("deleteTrack");
     });
   }
 
@@ -215,11 +255,20 @@ class _MapContainerState extends State<MapContainer> {
                 subdomains: <String>['a', 'b', 'c'],
               ),
               CurrentLocationOptions(
-                ///currently the cycle of reseting the widget is set on
-                ///the new current location which is obtained
-                ///However, any logic can used such as a real timer set to
-                ///certain duration can also be used
-                onLocationUpdate: () {},
+                onLocationUpdate: () {
+                  ///normally location update set state when called in current
+                  ///location layer so there is no need to call set state here
+                  ///if onlocation update is called in that layer. If it is not
+                  ///called then set state can be used
+                  ///
+                  //adds the new point during tracking
+                  if (Get.currentRoute == Routes.ADD_TRACK) {
+                    if (widget.trackRecording != null &&
+                        widget.trackRecording!().value) {
+                      widget.operateOnTrack!("updateTrack");
+                    }
+                  }
+                },
               ),
               //display all the marker chosen in the marker list
               if (Get.currentRoute == Routes.ADD_MARKER &&
@@ -257,8 +306,19 @@ class _MapContainerState extends State<MapContainer> {
                         },
                       ),
                     ),
-                ])
+                ]),
               ],
+
+              ///plot the current track item in this layer
+              if (widget.routeType == "Track")
+                PolylineLayerOptions(
+                  polylines: [
+                    Polyline(
+                        points: widget.polylineList!().value,
+                        strokeWidth: 4.0,
+                        color: Colors.purple)
+                  ],
+                ),
             ],
           ),
 
@@ -275,6 +335,8 @@ class _MapContainerState extends State<MapContainer> {
           ///disappeared so string conditions are used which would not wait
           ///for page to disappear
           if (widget.routeType == "Markers") ...allMarkerWidgets(),
+
+          if (widget.routeType == "Track") ...allTrackWidgets(),
         ],
       ),
     );
@@ -298,6 +360,25 @@ class _MapContainerState extends State<MapContainer> {
       ///button to delete the markers
       DeleteButton(
           featureTypeToDelete: "all markers", deleteFunction: deleteAllMarker)
+    ];
+  }
+
+  ///contains all the markers which are available in the add marker page
+  List<Widget> allTrackWidgets() {
+    return [
+      ///button to start and end tracking
+      ///Unlike the marker save region button is not seperate and is integrated
+      ///with the tracking button itself
+      ///whenever the user presses end track then file saving is executed
+      TrackingButton(
+        trackRecording: widget.trackRecording!,
+        startTrackFunction: startTracking,
+        endTrackFunction: endTracking,
+      ),
+
+      ///button to delete the current track
+      DeleteButton(
+          featureTypeToDelete: "current track", deleteFunction: deleteTrack)
     ];
   }
 }

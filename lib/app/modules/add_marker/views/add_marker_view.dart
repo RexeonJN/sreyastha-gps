@@ -33,12 +33,14 @@ class AddMarkerView extends GetView<AddMarkerController> {
                         Function? onTapped,
                         MarkerItem? markerItem,
                         MarkerType? markerType,
-                        double? altitude}) {
+                        double? altitude,
+                        double? accuracy}) {
                       controller.operateOnMarker(mode,
                           markerPoint: markerPoint,
                           onTapped: onTapped,
                           markerType: markerType,
-                          altitude: altitude);
+                          altitude: altitude,
+                          accuracy: accuracy);
                     },
                     getSelectedMarker: controller.getSelectedMarkerItem,
                     routeType: "Markers",

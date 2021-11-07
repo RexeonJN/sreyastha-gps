@@ -20,7 +20,6 @@ class SaveRegionButton extends StatelessWidget {
   void _saveFile(BuildContext context) {
     if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print(fileName.value);
       Navigator.of(context).pop();
 
       ///check whether the filename already exists or not. If it exits
@@ -50,7 +49,6 @@ class SaveRegionButton extends StatelessWidget {
           return;
         }
       }
-      print("overriden");
       storageController.saveAllMarkers(fileName.value);
     }
   }
