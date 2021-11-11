@@ -11,6 +11,7 @@ abstract class Routes {
   static const AUTHENTICATION = _Paths.AUTHENTICATION;
   static const SAVED = _Paths.SAVED;
   static const ADD_TRACK = _Paths.ADD_TRACK;
+  static const ADD_ROUTE = _Paths.ADD_ROUTE;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const AUTHENTICATION = '/authentication';
   static const SAVED = '/saved';
   static const ADD_TRACK = '/add-track';
+  static const ADD_ROUTE = '/add-route';
 }

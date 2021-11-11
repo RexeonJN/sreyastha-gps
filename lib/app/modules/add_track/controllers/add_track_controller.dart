@@ -17,9 +17,6 @@ class AddTrackController extends GetxController {
     _customMapController = CustomMapController(toUpdateUI: update);
   }
 
-  ///a getter function is used because the markerList is associated with
-  ///the controller. If the markerList is directly passed to the map container
-  ///then it will be a new instance and will not be connected to the controller.
   Rx<List<LatLng>> providePolylinePointsList() {
     return storageController.trackItem.polylinePoints;
   }

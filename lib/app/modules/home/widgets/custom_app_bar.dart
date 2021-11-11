@@ -83,6 +83,7 @@ class HomePageAppBar extends StatelessWidget {
                 Get.toNamed(Routes.ADD_MARKER);
                 break;
               case "Route":
+                Get.toNamed(Routes.ADD_ROUTE);
                 break;
               case "Track":
                 Get.toNamed(Routes.ADD_TRACK);

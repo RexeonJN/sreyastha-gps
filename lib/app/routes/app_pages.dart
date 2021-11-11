@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 
 import 'package:sreyastha_gps/app/modules/add_marker/bindings/add_marker_binding.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/views/add_marker_view.dart';
+import 'package:sreyastha_gps/app/modules/add_route/bindings/add_route_binding.dart';
+import 'package:sreyastha_gps/app/modules/add_route/views/add_route_view.dart';
 import 'package:sreyastha_gps/app/modules/add_track/bindings/add_track_binding.dart';
 import 'package:sreyastha_gps/app/modules/add_track/views/add_track_view.dart';
 import 'package:sreyastha_gps/app/modules/authentication/bindings/authentication_binding.dart';
@@ -57,6 +59,11 @@ class AppPages {
       name: _Paths.ADD_TRACK,
       page: () => AddTrackView(),
       binding: AddTrackBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADD_ROUTE,
+      page: () => AddRouteView(),
+      binding: AddRouteBinding(),
     ),
   ];
 }

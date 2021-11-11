@@ -88,5 +88,8 @@ class AddMarkerController extends GetxController {
   void onClose() {
     //dispose the controller as it will again be created for other controllers
     locationController.unsubscribePosition();
+
+    ///on closing the controller the selected marker must be set to null
+    storageController.markerList.changeSelectedItem(null);
   }
 }

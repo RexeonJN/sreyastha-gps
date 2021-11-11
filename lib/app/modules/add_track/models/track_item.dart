@@ -56,7 +56,7 @@ class TrackItem {
             locationController.currentLocation.value!.location.latitude,
             locationController.currentLocation.value!.location.longitude,
           ) >
-          5) {
+          2) {
         pointsInTrack.value.add(
           locationController.currentLocation.value!,
         );

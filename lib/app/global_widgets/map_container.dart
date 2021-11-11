@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 import 'package:sreyastha_gps/app/global_widgets/dynamic_map_layers/selected_marker_layer/selected_marker_widget_layer.dart';
+import 'package:sreyastha_gps/app/global_widgets/total_distance.dart';
 
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_item.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/widgets/current_location_marker_button.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/widgets/enter_location_button.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/widgets/forms/input_location.dart';
+import 'package:sreyastha_gps/app/modules/add_route/widgets/routing_button.dart';
+import 'package:sreyastha_gps/app/modules/add_route/widgets/undo_last_button.dart';
 import 'package:sreyastha_gps/app/modules/add_track/widgets/tracking_button.dart';
 
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
@@ -63,6 +67,20 @@ class MapContainer extends StatefulWidget {
 
   final Function(String)? operateOnTrack;
 
+  ///a getter method is used to get the value of the polyline
+  final Rx<List<LatLng>> Function()? routePolylineList;
+
+  ///to get the status of creation of the route
+  final Rx<bool> Function()? routeRecording;
+
+  final Function(String)? operateOnRoute;
+
+  ///get a list of all the available markers to plot a line
+  final Rx<List<Marker>> Function()? routeAvailableMarkerList;
+
+  ///total covered by a track or route
+  final Rx<double> Function()? totalDistanceCovered;
+
   MapContainer(
     this.obtainedController, {
     required this.routeType,
@@ -72,6 +90,11 @@ class MapContainer extends StatefulWidget {
     this.trackRecording,
     this.polylineList,
     this.operateOnTrack,
+    this.routePolylineList,
+    this.operateOnRoute,
+    this.routeRecording,
+    this.routeAvailableMarkerList,
+    this.totalDistanceCovered,
     Key? key,
   }) : super(key: key);
 
@@ -80,6 +103,16 @@ class MapContainer extends StatefulWidget {
 }
 
 class _MapContainerState extends State<MapContainer> {
+  @override
+  void initState() {
+    super.initState();
+    storageController.updateUI = update;
+  }
+
+  void update() {
+    setState(() {});
+  }
+
   ///below are functions related to marker widget
   ///
   ///this function is passed as an update function to the input location form
@@ -117,7 +150,7 @@ class _MapContainerState extends State<MapContainer> {
           onTapped: () {
         ///there is no need to update the markerlist on the map because after
         ///its creation a pop up has to open
-        setState(() {});
+        if (storageController.updateUI != null) storageController.updateUI!();
       }, markerType: MarkerType.enterLocation);
 
     ///id of the last marker will be counter -1 as the counter increases
@@ -140,7 +173,7 @@ class _MapContainerState extends State<MapContainer> {
                 .location, onTapped: () {
           ///this function is executed whenever the marker selected
           ///on the map is tapped
-          setState(() {});
+          if (storageController.updateUI != null) storageController.updateUI!();
         },
             markerType: MarkerType.getCurrentLocation,
             altitude: widget.obtainedController.currentLocation.value!.altitude,
@@ -177,6 +210,20 @@ class _MapContainerState extends State<MapContainer> {
   void deleteTrack() {
     setState(() {
       if (widget.operateOnTrack != null) widget.operateOnTrack!("deleteTrack");
+    });
+  }
+
+  ///undo last line in route item
+  void undoLastLine() {
+    setState(() {
+      if (widget.operateOnRoute != null) widget.operateOnRoute!("undoLastLine");
+    });
+  }
+
+  ///delete the route item
+  void deleteRoute() {
+    setState(() {
+      if (widget.operateOnRoute != null) widget.operateOnRoute!("deleteRoute");
     });
   }
 
@@ -227,7 +274,8 @@ class _MapContainerState extends State<MapContainer> {
                         onTapped: () {
                       ///this function is executed whenever the marker selected
                       ///on the map is tapped
-                      setState(() {});
+                      if (storageController.updateUI != null)
+                        storageController.updateUI!();
                     }, markerType: MarkerType.markOnMap);
                   });
                 }
@@ -319,6 +367,24 @@ class _MapContainerState extends State<MapContainer> {
                         color: Colors.purple)
                   ],
                 ),
+
+              ///plot available markers, route markers and polyline in route page
+              if (widget.routeType == 'Route' &&
+                  widget.routeAvailableMarkerList != null) ...[
+                if (widget.routePolylineList != null &&
+                    widget.routePolylineList!().value.length > 1)
+                  PolylineLayerOptions(
+                    polylines: [
+                      Polyline(
+                          points: widget.routePolylineList!().value,
+                          strokeWidth: 4.0,
+                          color: Colors.green)
+                    ],
+                  ),
+                MarkerLayerOptions(
+                  markers: widget.routeAvailableMarkerList!().value,
+                ),
+              ]
             ],
           ),
 
@@ -337,12 +403,14 @@ class _MapContainerState extends State<MapContainer> {
           if (widget.routeType == "Markers") ...allMarkerWidgets(),
 
           if (widget.routeType == "Track") ...allTrackWidgets(),
+
+          if (widget.routeType == "Route") ...allRouteWidgets(),
         ],
       ),
     );
   }
 
-  ///contains all the markers which are available in the add marker page
+  ///contains all the widgets which are available in the add marker page
   List<Widget> allMarkerWidgets() {
     return [
       ///this is a button to enter the location manually which will
@@ -363,7 +431,7 @@ class _MapContainerState extends State<MapContainer> {
     ];
   }
 
-  ///contains all the markers which are available in the add marker page
+  ///contains all widgets which are available in the add track page
   List<Widget> allTrackWidgets() {
     return [
       ///button to start and end tracking
@@ -379,6 +447,36 @@ class _MapContainerState extends State<MapContainer> {
       ///button to delete the current track
       DeleteButton(
           featureTypeToDelete: "current track", deleteFunction: deleteTrack)
+    ];
+  }
+
+  ///contains all the widgets which are available in the add route page
+  List<Widget> allRouteWidgets() {
+    return [
+      ///button to start or end creating routes
+      RoutingButton(
+        creationStatus: widget.routeRecording!,
+        startCreating: () {
+          setState(() {
+            widget.operateOnRoute!("startRoute");
+          });
+        },
+        endCreating: () {
+          setState(() {
+            widget.operateOnRoute!("endRoute");
+          });
+        },
+      ),
+
+      ///button to delete the current route
+      DeleteButton(
+          featureTypeToDelete: "current route", deleteFunction: deleteRoute),
+
+      ///button to undo the last line
+      UndoLastButton(deleteFunction: undoLastLine),
+
+      ///total distance covered
+      TotalDistance(totalDistance: widget.totalDistanceCovered!),
     ];
   }
 }

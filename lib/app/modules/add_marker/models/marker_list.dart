@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 import 'package:sreyastha_gps/app/data/models/latlng_data.dart';
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
@@ -46,12 +47,12 @@ class MarkerList {
       builder: (context) => InkWell(
         onTap: () {
           changeSelectedItem(id);
-
-          if (Get.currentRoute == Routes.ADD_MARKER) {
-            //this function set the orientation using offset of the detail marker
-            onTapped!();
-            //print(selectedItem.value);
+          print(id);
+          if (Get.currentRoute == Routes.ADD_ROUTE) {
+            storageController.addRoutePoint(id);
+            print(storageController.routeItem.lineInRoute.value);
           }
+          onTapped!();
         },
         child: Container(
           decoration: BoxDecoration(
@@ -143,5 +144,11 @@ class MarkerList {
         .where((element) => element != null)
         .map((e) => e!.listOfAttributes)
         .toList();
+  }
+
+  ///function to get the list of all marker item in he marker list
+  ///required to save in the points in map of the route item
+  Rx<List<MarkerItem>> get markerListAsMarkerItem {
+    return Rx(_markerList.value.values.map((e) => e!).toList());
   }
 }

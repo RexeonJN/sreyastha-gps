@@ -10,6 +10,7 @@ import 'package:sreyastha_gps/app/core/constants/all_files.dart';
 import 'package:sreyastha_gps/app/data/enums/feature.dart';
 import 'package:sreyastha_gps/app/data/models/file_details.dart';
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_list.dart';
+import 'package:sreyastha_gps/app/modules/add_route/models/route_item.dart';
 import 'package:sreyastha_gps/app/modules/add_track/models/track_item.dart';
 
 class StorageController extends GetxController {
@@ -21,6 +22,10 @@ class StorageController extends GetxController {
   MarkerList markerList = MarkerList();
 
   TrackItem trackItem = TrackItem();
+
+  RouteItem routeItem = RouteItem();
+
+  Function? updateUI;
 
   ///Directories to be accessed by the app
   Directory? mainDirectory;
@@ -219,7 +224,6 @@ class StorageController extends GetxController {
           path: finalPath,
         ),
       );
-      print(ALL_FILES);
     } catch (e) {}
   }
 
@@ -276,4 +280,10 @@ class StorageController extends GetxController {
 
   ///there is no need of delete all tracks function as only one track will be
   ///shown at a time
+  void addRoutePoint(int id) {
+    routeItem.createNext(routeItem.convertMarkerItemToRoutePoint(markerList
+        .markerListAsMarkerItem.value
+        .where((element) => element.id == id)
+        .first));
+  }
 }
