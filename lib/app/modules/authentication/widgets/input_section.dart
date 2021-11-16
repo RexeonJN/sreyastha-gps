@@ -18,8 +18,8 @@ class InputSection extends StatelessWidget {
           if (controller.authMode == AuthMode.Signup) ...[
             CustomTextInputField(
               enabled: controller.authMode == AuthMode.Signup,
-              labelText: "First name",
-              hintText: "John",
+              labelText: "Name",
+              hintText: "John Doe",
               inputType: TextInputType.name,
               validator: (value) {
                 ///It simply checks whether the name of the user is entered
@@ -29,35 +29,13 @@ class InputSection extends StatelessWidget {
                 return null;
               },
               onSaved: (value) {
-                controller.authData['first name'] = value!;
+                if (value != null) controller.authData['name'] = value;
               },
             ),
             _verticalGap(),
           ],
 
-          ///Similarly, last name of user can be entered during their
-          ///registration
-          if (controller.authMode == AuthMode.Signup) ...[
-            CustomTextInputField(
-              enabled: controller.authMode == AuthMode.Signup,
-              labelText: "Last name",
-              hintText: "Doe",
-              inputType: TextInputType.name,
-              validator: (value) {
-                ///It simply checks whether the name of the user is entered
-                if (value!.isEmpty) {
-                  return 'Enter your last name';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                controller.authData['last name'] = value!;
-              },
-            ),
-            _verticalGap(),
-          ],
-
-          ///User can entered an email
+          ///User can enter an email
           CustomTextInputField(
             labelText: "Email",
             hintText: "JohnDoe@domain.com",
@@ -70,13 +48,37 @@ class InputSection extends StatelessWidget {
               return null;
             },
             onSaved: (value) {
-              controller.authData['email'] = value!;
+              if (value != null) controller.authData['email'] = value;
             },
           ),
           _verticalGap(),
 
+          ///User can enter a phone number
+          if (controller.authMode == AuthMode.Signup)
+            CustomTextInputField(
+              labelText: "phone number",
+              hintText: "9876543210",
+              inputType: TextInputType.number,
+              validator: (value) {
+                ///to check whether the phone number is valid or not
+                if (value != null) {
+                  int? _checkValue = int.tryParse(value);
+                  if (_checkValue == null ||
+                      _checkValue.isLowerThan(1000000000)) {
+                    return 'Invalid phone number';
+                  }
+                }
+                return null;
+              },
+              onSaved: (value) {
+                if (value != null) controller.authData['phonenumber'] = value;
+              },
+            ),
+          _verticalGap(),
+
           ///User can enter the password which needs to be checked with confirm
           ///password during the registration process
+
           CustomTextInputField(
             labelText: "Password",
             hintText: "12345",
@@ -130,7 +132,8 @@ class InputSection extends StatelessWidget {
                     }
                   : null,
               onSaved: (value) {
-                if (value != null) controller.authData['password'] = value;
+                if (value != null)
+                  controller.authData['confirmpassword'] = value;
               },
             ),
         ],

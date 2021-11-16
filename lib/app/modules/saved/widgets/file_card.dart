@@ -223,6 +223,22 @@ class FileCard extends StatelessWidget {
           }
         });
         break;
+      case "Routes":
+        storageController.routeItem.deleteRouteItem();
+        storageController
+            .fetchRouteFromCsv(filename: fileDetails.filename)
+            .then((value) {
+          if (value) {
+            ///this is done to reload route from a new file
+            Get.back();
+            Get.back();
+            Future.delayed(Duration(milliseconds: 500))
+                .then((value) => Get.toNamed(Routes.ADD_ROUTE));
+          } else {
+            _fileNotExists(context, "add route");
+          }
+        });
+        break;
     }
   }
 }

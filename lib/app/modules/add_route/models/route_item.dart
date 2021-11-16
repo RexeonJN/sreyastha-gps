@@ -1,10 +1,13 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
+import 'package:sreyastha_gps/app/data/models/latlng_data.dart';
 
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_item.dart';
-import 'package:sreyastha_gps/app/modules/add_route/models/route_marker_item.dart';
+import 'package:sreyastha_gps/app/modules/add_route/models/route_point.dart';
 
 class RouteItem {
   ///there is no need of id or name as the filename can be used either as id or
@@ -113,13 +116,13 @@ class RouteItem {
   List<String> get nameOfAttributes => [
         ///here name is for the name of the marker. the name of route is filename
         "Name",
-        "Description",
         "Latitude",
         "Longitude",
         "Accuracy",
         "Altitude",
         "Date",
         "Time",
+        "MarkerType"
       ];
 
   ///function to get the list of all MarkerItem which can be saved
@@ -143,9 +146,72 @@ class RouteItem {
             : "0",
         "${oneRow.location.timestamp.year}-${oneRow.location.timestamp.month}-${oneRow.location.timestamp.day}",
         "${oneRow.location.timestamp.hour}-${oneRow.location.timestamp.minute}-${oneRow.location.timestamp.second}",
+        markerAsStrings(oneRow.markerType),
       ];
 
-  ///TODO:A function to create route from the list
+  /// create routepoint and markers from the list
   ///loading a route will override the markerlist in marker page as well
+  ///the markers will not be touchable and can only be viewed
+  void createRouteFromList(List<String> data, {bool? last}) {
+    final List<String> date = data[5].split('-');
+    final List<String> time = data[6].split('-');
+    int _counter = 1;
+    pointsInMap.value.add(
+      MarkerItem(
+        id: _counter,
+        name: data[0],
+        marker: Marker(
+          height: 25,
+          width: 25,
+          point: LatLng(
+            double.parse(data[1]),
+            double.parse(data[2]),
+          ),
+          builder: (context) => InkWell(
+            onTap: () {},
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: last != null && last ? Colors.orange : Colors.green,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 1,
+                      spreadRadius: 1.5,
+                      offset: Offset(0, 1)),
+                ],
+              ),
+            ),
+          ),
+        ),
+        location: LatlngData(
+            location: LatLng(double.parse(data[1]), double.parse(data[2])),
+            timestamp: DateTime(
+                int.parse(date[0]),
+                int.parse(date[1]),
+                int.parse(date[2]),
+                int.parse(time[0]),
+                int.parse(time[1]),
+                int.parse(time[2]))),
+        markerType: getMarkerType(data[7]),
+      ),
+    );
 
+    pointInRoute.value.add(
+      RoutePoint(
+        id: _counter,
+        name: data[0],
+        location: LatlngData(
+            location: LatLng(double.parse(data[1]), double.parse(data[2])),
+            timestamp: DateTime(
+                int.parse(date[0]),
+                int.parse(date[1]),
+                int.parse(date[2]),
+                int.parse(time[0]),
+                int.parse(time[1]),
+                int.parse(time[2]))),
+        markerType: getMarkerType(data[7]),
+      ),
+    );
+  }
 }

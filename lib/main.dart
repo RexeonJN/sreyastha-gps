@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sreyastha_gps/app/data/controllers/auth_controller.dart';
 import 'package:sreyastha_gps/app/data/controllers/build_screen_controller.dart';
 import 'package:sreyastha_gps/app/data/controllers/storage_controller.dart';
 
@@ -13,7 +15,12 @@ void main() {
   Get.put(GpsLocationController());
   Get.put(StorageController());
   Get.put(BuildScreenController());
-  runApp(MyApp());
+  Get.put(AuthController());
+
+  ///prevent device orientation
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) => runApp(MyApp()));
 }
 
 class MyApp extends StatelessWidget {

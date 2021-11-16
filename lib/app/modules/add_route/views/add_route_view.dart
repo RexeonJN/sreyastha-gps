@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'package:sreyastha_gps/app/global_widgets/map_container.dart';
 import 'package:sreyastha_gps/app/global_widgets/map_widgets/move_to_current_location_button.dart';
+import 'package:sreyastha_gps/app/modules/add_route/widgets/load_route_button.dart';
 import 'package:sreyastha_gps/app/modules/add_route/widgets/route_page_heading.dart';
 
 import '../controllers/add_route_controller.dart';
@@ -28,6 +29,7 @@ class AddRouteView extends GetView<AddRouteController> {
                   ),
                   RoutePageHeading(),
                   MovetoCurrentLocationButton(controller: controller),
+                  LoadRouteButton(),
                 ],
               )
             : CircularProgressIndicator(),

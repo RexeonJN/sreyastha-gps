@@ -101,8 +101,9 @@ class MarkerList {
           double.parse(data[2]),
         ),
         _counter,
-        //TODO:the on tap function needs to be implemented
-        () {},
+        () {
+          if (storageController.updateUI != null) storageController.updateUI!();
+        },
         getMarkerType(data[8]),
       ),
     );

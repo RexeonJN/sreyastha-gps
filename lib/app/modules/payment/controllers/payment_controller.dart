@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:sreyastha_gps/app/core/constants/controllers.dart';
+import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 class PaymentController extends GetxController {
   late Razorpay razorpay;
@@ -13,6 +15,11 @@ class PaymentController extends GetxController {
   ///Otherwise the payments will remain authorised which then needs to capture
   ///in the razorpay dashboard
   String? orderId;
+
+  ///to wait until the payment page opens
+  Rx<bool> isLoading = false.obs;
+
+  String? type;
 
   @override
   void onInit() {
@@ -24,7 +31,9 @@ class PaymentController extends GetxController {
     ///in this events recieve payment and order id which we can use
     ///for future refund or activities
     razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlerPaymentSuccess);
-    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlerPaymentFailure);
+
+    ///payment failure is not considered as razorpay handles it using
+    ///retry payment
   }
 
   void openCheckout(String type, BuildContext context) {
@@ -37,8 +46,8 @@ class PaymentController extends GetxController {
       "order_id": orderId,
       "description": "Payment for some random product",
       "prefill": {
-        "contact": "10987654321",
-        "email": "kundaldeybgp2@gmail.com",
+        "contact": authController.phoneNumber,
+        "email": authController.email,
       },
       "external": {
         "wallets": ["paytm"]
@@ -72,18 +81,22 @@ class PaymentController extends GetxController {
   }
 
   ///create order id in the server and get it back
-  void sendTypeOfPayment(String type, BuildContext context) {
+  void sendTypeOfPayment(String type, BuildContext context) async {
+    isLoading.value = true;
+
+    type = type;
+
     ///url given to post the type of payment
     final url = Uri.parse('https://orderid-api.herokuapp.com/order_id');
 
     ///this POST request is sent to my flask server which (if succeeds) then
     ///returns the order id as a response
     try {
-      http
+      await http
           .post(
         url,
         headers: {"Content-Type": "application/json"},
-        body: json.encode({"amount": "5000"}),
+        body: json.encode({"amount": type == "monthly" ? 2000 : 20000}),
       )
           .then((response) {
         ///to check whether server is able to fetch order id from razorpay
@@ -94,19 +107,45 @@ class PaymentController extends GetxController {
     } catch (e) {
       checkInternet(context);
     }
+    isLoading.value = false;
   }
 
+  ///on the success of the payment save subscription is called which
+  ///stores the expiry date. If it succeed then send a login and receive a
+  ///expiry date of the subscripion.
   void handlerPaymentSuccess(PaymentSuccessResponse response) {
-    print("The RESPONSE is");
-
-    ///On attaining success, register the expiry date of the payment made
-  }
-
-  void handlerPaymentFailure(PaymentFailureResponse response) {
-    print(response);
-
-    ///On failure, send a pop up that the payment method has failed and in case
-    ///we receive the amount we will notify it accordingly
+    authController
+        .saveSubscription(authController.email!, type == "monthly" ? 30 : 365)
+        .then((value) {
+      if (value == "subscription saved") {
+        Get.dialog(
+          AlertDialog(
+            title: Text(
+              "Your subscription has been added",
+            ),
+          ),
+        );
+        Future.delayed(Duration(seconds: 1)).then((value) => Get.back());
+        Future.delayed(Duration(seconds: 2)).then((_) async {
+          ///whenever this is called, it is called after the login
+          ///process so the email and password must have been saved
+          await authController
+              .login(authController.email!,
+                  authController.temporarySubscriptionPassword!)
+              .then((value) {
+            authController.temporarySubscriptionPassword = null;
+            if (value == "Logged in") Get.offAllNamed(Routes.HOME);
+          });
+        });
+      }
+    }).onError(
+      (error, _) => Get.dialog(
+        AlertDialog(
+          title: Text(
+              "An Internal Error Occured from our side. Kindly call us to update about your subscription. We will respond with a proper email."),
+        ),
+      ),
+    );
   }
 
   @override

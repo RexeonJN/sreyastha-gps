@@ -75,7 +75,6 @@ class TrackItem {
 
   void stopTracking() {
     ///turns off the recording and cancels the timer used for the time interval
-    ///TODO:remember to save the track item once tracking is complete
     recording.value = false;
     if (_timer != null || (_timer != null && _timer!.isActive))
       _timer!.cancel();
