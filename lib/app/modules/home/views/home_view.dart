@@ -84,7 +84,9 @@ class HomeView extends GetView<HomeController> {
             IconNavigate(Icons.settings, active, () {
               Get.toNamed(Routes.SETTINGS, arguments: 0);
             }),
-            IconNavigate(Icons.person, active, () {}),
+            IconNavigate(Icons.person, active, () {
+              Get.toNamed(Routes.PROFILE);
+            }),
 
             /// this is present only to create an even distribution of buttons.
             /// in its place a floating action button will be shown.

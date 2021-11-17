@@ -1,5 +1,7 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 class SideMenuItem {
   final String text;
@@ -36,22 +38,26 @@ class SideMenuList extends StatelessWidget {
         onTapItem: () {
           //to close drawer and then navigate to a screen
           Navigator.pop(scaffoldKey.currentContext!);
+          Get.toNamed(Routes.SAVED, arguments: 0);
         },
       ),
       SideMenuItem(
-          text: "Offers",
+          text: "Settings",
           onTapItem: () {
             Navigator.pop(scaffoldKey.currentContext!);
+            Get.toNamed(Routes.SETTINGS, arguments: 0);
           }),
       SideMenuItem(
-          text: "MemberShip",
+          text: "Profile",
           onTapItem: () {
             Navigator.pop(scaffoldKey.currentContext!);
+            Get.toNamed(Routes.PROFILE);
           }),
       SideMenuItem(
         text: "Contact Us",
         onTapItem: () {
           Navigator.pop(scaffoldKey.currentContext!);
+          Get.toNamed(Routes.CONTACT_US);
         },
       ),
     ];
@@ -61,16 +67,19 @@ class SideMenuList extends StatelessWidget {
           text: "Terms and Conditions",
           onTapItem: () {
             Navigator.pop(scaffoldKey.currentContext!);
+            Get.toNamed(Routes.TERMS_AND_CONDITIONS);
           }),
       SideMenuItem(
-          text: "FAQ",
+          text: "How to use?",
           onTapItem: () {
             Navigator.pop(scaffoldKey.currentContext!);
+            Get.toNamed(Routes.FAQ);
           }),
       SideMenuItem(
           text: "Privacy Policy",
           onTapItem: () {
             Navigator.pop(scaffoldKey.currentContext!);
+            Get.toNamed(Routes.PRIVACY_POLICY);
           }),
     ];
 
@@ -104,32 +113,32 @@ class SideMenuList extends StatelessWidget {
             ),
           )
           .toList()
-            ..add(
-              ExpandableNotifier(
-                child: Expandable(
-                  collapsed: ExpandableButton(
-                    child: mainCategory("FAQ", Icon(Icons.add)),
-                  ),
-                  expanded: ExpandableButton(
-                    child: Column(
-                      children: [
-                        mainCategory("FAQ", Icon(Icons.minimize)),
-                        Column(
-                          children: faqCategories
-                              .map(
-                                (e) => subCategory(
-                                  e.text,
-                                  e.onTapItem,
-                                ),
-                              )
-                              .toList(),
-                        ),
-                      ],
+        ..add(
+          ExpandableNotifier(
+            child: Expandable(
+              collapsed: ExpandableButton(
+                child: mainCategory("FAQ", Icon(Icons.add)),
+              ),
+              expanded: ExpandableButton(
+                child: Column(
+                  children: [
+                    mainCategory("FAQ", Icon(Icons.minimize)),
+                    Column(
+                      children: faqCategories
+                          .map(
+                            (e) => subCategory(
+                              e.text,
+                              e.onTapItem,
+                            ),
+                          )
+                          .toList(),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
+          ),
+        ),
     );
   }
 

@@ -15,12 +15,15 @@ class AuthController extends GetxController {
   ///the email,name and the phone number needs to be stored
   /// in the shared preferences so that it
   ///can be shown when the user has logged in
-  String? email;
+  String? _email;
   String? _name;
   String? _phoneNumber;
-  String? _userId;
+  String? _expiryDate;
 
+  String? get email => _email;
   String? get phoneNumber => _phoneNumber;
+  String? get name => _name;
+  String? get expiryDate => _expiryDate;
 
   ///password of a successful login is saved during subscription
   String? temporarySubscriptionPassword;
@@ -43,7 +46,9 @@ class AuthController extends GetxController {
   }
 
   ///this is used as common function for login and sign up
-  Future<String?> _authenticate(String urlSegment, String body) async {
+  Future<String?> _authenticate(
+      String urlSegment, String body, String givenEmail) async {
+    _email = givenEmail;
     final url = Uri.parse('https://gpsbackendcode.herokuapp.com/' + urlSegment);
 
     try {
@@ -85,9 +90,12 @@ class AuthController extends GetxController {
       if (responseData["token"] != null) {
         _token.value = responseData["token"];
         _tokenExpiryDate = Rx(DateTime.now().add(Duration(days: 1)));
-        _userId = responseData["userId"];
-        //_name = responseData["name"];
-        //_phoneNumber = responseData["phonenumber"].toString()
+
+        var tempTime = DateTime.parse(responseData["subscriptionDuration"]);
+        _expiryDate = "${tempTime.day}-${tempTime.month}-${tempTime.year}";
+
+        _name = responseData["name"];
+        _phoneNumber = responseData["phonenumber"].toString();
 
         ///whenever i log in i update tokenexpirydate, then i start a timer
         ///which continues for a day then it calls a logout function
@@ -102,10 +110,10 @@ class AuthController extends GetxController {
         final userData = json.encode({
           "token": _token.value,
           "expiryDate": _tokenExpiryDate!.value.toIso8601String(),
-          "phonenumber": _phoneNumber,
+          "phonenumber": phoneNumber,
           "email": email,
-          "name": _name,
-          "userId": _userId,
+          "name": name,
+          "susbcriptionExpiryDate": expiryDate,
         });
 
         ///write the data
@@ -130,14 +138,14 @@ class AuthController extends GetxController {
     };
 
     ///waits for authenticate to complete
-    return _authenticate("signup", jsonEncode(data));
+    return _authenticate("signup", jsonEncode(data), email);
   }
 
   //this is used to login
   Future<String?> login(String email, String password) async {
     final data = {"email": email, "password": password};
 
-    return _authenticate("login", jsonEncode(data));
+    return _authenticate("login", jsonEncode(data), email);
   }
 
   ////this is called whenever the subscription has been taken
@@ -174,7 +182,9 @@ class AuthController extends GetxController {
   Future<void> logout() async {
     _token.value = null;
     _tokenExpiryDate = null;
-    _userId = null;
+
+    ///no need to nullify all other variables as they will not be seen or used if
+    ///isAuth returns false  because of this two variables
     if (_authTimer != null) {
       _authTimer!.cancel();
       _authTimer = null;
@@ -224,8 +234,14 @@ class AuthController extends GetxController {
     ///as the data stored is valid and can be used to login again
     _token.value = extractedUserData["token"];
     _tokenExpiryDate = Rx(expiryDate);
+    _name = extractedUserData["name"];
+    _phoneNumber = extractedUserData["phonenumber"];
+    _email = extractedUserData["email"];
+    _expiryDate = extractedUserData["susbcriptionExpiryDate"];
+
     autoLogout();
     update();
+    print(_expiryDate);
     return true;
   }
 }

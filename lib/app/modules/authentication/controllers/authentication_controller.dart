@@ -84,20 +84,21 @@ class AuthenticationController extends GetxController {
         // Log user in
         await authController
             .login(authData["email"], authData["password"])
-            .then((value) {
-          authController.email = authData["email"];
-          authController.temporarySubscriptionPassword = authData["password"];
-
-          ///if user is trying to login but hasnt subscribed
-          if (value == "Not subscribed") {
-            Get.toNamed(Routes.PAYMENT);
-            authController.email = authData["email"];
+            .then(
+          (value) {
             authController.temporarySubscriptionPassword = authData["password"];
-          }
 
-          ///if the user has subscribed and is loggin in
-          if (value == "Logged in") Get.offAllNamed(Routes.HOME);
-        });
+            ///if user is trying to login but hasnt subscribed
+            if (value == "Not subscribed") {
+              Get.toNamed(Routes.PAYMENT);
+              authController.temporarySubscriptionPassword =
+                  authData["password"];
+            }
+
+            ///if the user has subscribed and is loggin in
+            if (value == "Logged in") Get.offAllNamed(Routes.HOME);
+          },
+        );
       } else {
         ///returns a message that the user has been created and the user id
         await authController
