@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:sreyastha_gps/app/core/constants/all_files.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
-import 'package:sreyastha_gps/app/data/models/file_details.dart';
 
 class SaveRegionButton extends StatelessWidget {
   SaveRegionButton({
@@ -24,9 +23,9 @@ class SaveRegionButton extends StatelessWidget {
 
       ///check whether the filename already exists or not. If it exits
       /// then it gives user a chance to either skip it or override it
-      final allSavedRegions = ALL_FILES['Markers']!.values;
-      for (FileDetails singleFile in allSavedRegions) {
-        if (fileName == singleFile.filename) {
+      final allSavedRegions = ALL_SAVED_FILES_FROM_THE_APP['Markers']!.values;
+      for (Map<String, dynamic> singleFile in allSavedRegions) {
+        if (fileName == singleFile["filename"]) {
           showDialog(
             context: context,
             builder: (context) =>

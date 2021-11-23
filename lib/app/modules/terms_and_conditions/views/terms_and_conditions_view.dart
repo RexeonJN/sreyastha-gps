@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sreyastha_gps/app/global_widgets/static_content.dart';
 import 'package:sreyastha_gps/app/global_widgets/static_page_heading.dart';
 

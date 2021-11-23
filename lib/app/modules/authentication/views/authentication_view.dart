@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
 import 'package:sreyastha_gps/app/data/enums/auth_type.dart';
 import 'package:sreyastha_gps/app/modules/authentication/widgets/input_section.dart';
+import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 import '../controllers/authentication_controller.dart';
 
@@ -80,6 +81,8 @@ class AuthenticationView extends GetView<AuthenticationController> {
     return InputSection();
   }
 
+  ///TODO:to add forgot password
+  ///TODO:to add reset password
   Widget rememberOrForgetPassword() {
     return Column(
       children: [
@@ -111,12 +114,19 @@ class AuthenticationView extends GetView<AuthenticationController> {
             ),
           ),
         ),
-        Text(
-          "I agree with all the terms and conditions",
-          style: TextStyle(
-            color: Colors.blue,
+
+        /// move to terms and conditions page
+        TextButton(
+          onPressed: () {
+            Get.toNamed(Routes.TERMS_AND_CONDITIONS);
+          },
+          child: Text(
+            "I agree with all the terms and conditions",
+            style: TextStyle(
+              color: Colors.blue,
+            ),
           ),
-        )
+        ),
       ],
     );
   }

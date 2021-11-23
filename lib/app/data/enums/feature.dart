@@ -15,3 +15,17 @@ String returnFeatureAsString(Feature feature) {
       return "Route";
   }
 }
+
+///return feature by getting the string
+Feature getFeatureFromString(String feature) {
+  switch (feature) {
+    case "Region":
+      return Feature.Marker;
+    case "Track":
+      return Feature.Track;
+    case "Route":
+      return Feature.Route;
+    default:
+      return Feature.Marker;
+  }
+}

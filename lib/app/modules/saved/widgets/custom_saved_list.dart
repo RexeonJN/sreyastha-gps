@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sreyastha_gps/app/core/constants/all_files.dart';
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
+import 'package:sreyastha_gps/app/data/enums/feature.dart';
+import 'package:sreyastha_gps/app/data/models/file_details.dart';
 
 import 'package:sreyastha_gps/app/modules/saved/controllers/saved_controller.dart';
 import 'package:sreyastha_gps/app/modules/saved/widgets/file_card.dart';
@@ -14,7 +16,7 @@ class CustomSavedList extends GetView<SavedController> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: ALL_FILES[fileType]!
+      children: ALL_SAVED_FILES_FROM_THE_APP[fileType]!
           .values
           .map(
             (specificFile) => Container(
@@ -25,7 +27,12 @@ class CustomSavedList extends GetView<SavedController> {
                   color: light,
                   height: MediaQuery.of(context).size.height * 0.15,
                   child: FileCard(
-                    fileDetails: specificFile,
+                    fileDetails: FileDetails(
+                      path: specificFile["path"]!,
+                      created: DateTime.parse(specificFile["created"]!),
+                      feature: getFeatureFromString(specificFile["feature"]!),
+                      filename: specificFile["filename"]!,
+                    ),
                     fileType: fileType,
                   ),
                 ),

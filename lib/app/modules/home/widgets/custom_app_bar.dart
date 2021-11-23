@@ -1,11 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sreyastha_gps/app/data/controllers/auth_controller.dart';
 import 'package:sreyastha_gps/app/data/enums/feature.dart';
 
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 import '/app/core/themes/colors.dart';
+
+enum HomePageOptions {
+  about,
+  settings,
+  contact,
+}
+
+String homePageOptionsAsStrings(HomePageOptions options) {
+  switch (options) {
+    case HomePageOptions.about:
+      return "About Us";
+    case HomePageOptions.settings:
+      return "Settings";
+    case HomePageOptions.contact:
+      return "Contact Us";
+  }
+}
 
 class HomePageAppBar extends StatelessWidget {
   final Function _openDrawer;
@@ -56,17 +74,63 @@ class HomePageAppBar extends StatelessWidget {
               color: active,
             ),
           ),
-          Text(
-            "Sreyastha GPS",
-            style: GoogleFonts.poppins(color: active),
-            textScaleFactor: 1.1,
+
+          ///this part is simply used to run the autologging function when
+          ///the app launches. Various middlewares can be used to improve the
+          ///structure but is not done at the moment
+          GetX<AuthController>(
+            builder: (controller) {
+              return !controller.isAuth.value
+                  ? FutureBuilder(
+                      builder: (ctx, snapshot) {
+                        return Text(
+                          "Sreyastha GPS",
+                          style: GoogleFonts.poppins(color: active),
+                          textScaleFactor: 1.1,
+                        );
+                      },
+                      future: controller.tryAutoLogging(),
+                    )
+                  : Text(
+                      "Sreyastha GPS",
+                      style: GoogleFonts.poppins(color: active),
+                      textScaleFactor: 1.1,
+                    );
+            },
           ),
-          IconButton(
-            icon: Icon(
-              Icons.search,
-              color: active,
-            ),
-            onPressed: () {},
+
+          PopupMenuButton<HomePageOptions>(
+            itemBuilder: (context) {
+              return <PopupMenuEntry<HomePageOptions>>[
+                PopupMenuItem(
+                  child: Text(homePageOptionsAsStrings(HomePageOptions.about)),
+                  value: HomePageOptions.about,
+                ),
+                PopupMenuItem(
+                  child:
+                      Text(homePageOptionsAsStrings(HomePageOptions.settings)),
+                  value: HomePageOptions.settings,
+                ),
+                PopupMenuItem(
+                  child:
+                      Text(homePageOptionsAsStrings(HomePageOptions.contact)),
+                  value: HomePageOptions.contact,
+                ),
+              ];
+            },
+            onSelected: (value) {
+              switch (value) {
+                case HomePageOptions.about:
+                  Get.toNamed(Routes.ABOUT);
+                  break;
+                case HomePageOptions.settings:
+                  Get.toNamed(Routes.SETTINGS, arguments: 0);
+                  break;
+                case HomePageOptions.contact:
+                  Get.toNamed(Routes.CONTACT_US);
+                  break;
+              }
+            },
           ),
         ],
       ),

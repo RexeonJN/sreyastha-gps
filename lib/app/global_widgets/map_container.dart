@@ -81,6 +81,12 @@ class MapContainer extends StatefulWidget {
   ///total covered by a track or route
   final Rx<double> Function()? totalDistanceCovered;
 
+  ///for setting and getting marking status
+  final Function? currentlyMarkingGetter;
+  final Function? currentlyMarkingSetter;
+  final Function? updateAverageLocation;
+  final Function? getAverageLocation;
+
   MapContainer(
     this.obtainedController, {
     required this.routeType,
@@ -95,6 +101,10 @@ class MapContainer extends StatefulWidget {
     this.routeRecording,
     this.routeAvailableMarkerList,
     this.totalDistanceCovered,
+    this.currentlyMarkingGetter,
+    this.currentlyMarkingSetter,
+    this.updateAverageLocation,
+    this.getAverageLocation,
     Key? key,
   }) : super(key: key);
 
@@ -162,15 +172,21 @@ class _MapContainerState extends State<MapContainer> {
       updateFunction(context);
   }
 
+  LatLng _currentLocation(bool moreAccurate) {
+    if (widget.getAverageLocation != null && moreAccurate) {
+      return widget.getAverageLocation!();
+    }
+    return widget.obtainedController.currentLocation.value!.location;
+  }
+
   ///to mark current location as the marker
-  void currentLocationAsMarker() {
+  void currentLocationAsMarker(bool moreAccurate) {
     if (widget.operateOnMarker != null &&
         widget.obtainedController.currentLocation.value != null) {
       setState(() {
         ///updates the markerlist with the current location as marker
         widget.operateOnMarker!("create",
-            markerPoint: widget.obtainedController.currentLocation.value!
-                .location, onTapped: () {
+            markerPoint: _currentLocation(moreAccurate), onTapped: () {
           ///this function is executed whenever the marker selected
           ///on the map is tapped
           if (storageController.updateUI != null) storageController.updateUI!();
@@ -316,6 +332,18 @@ class _MapContainerState extends State<MapContainer> {
                       widget.operateOnTrack!("updateTrack");
                     }
                   }
+                  if (Get.currentRoute == Routes.ADD_MARKER &&
+                      widget.currentlyMarkingGetter != null) {
+                    if (widget.currentlyMarkingGetter!()) {
+                      if (widget.updateAverageLocation != null)
+                        widget.updateAverageLocation!(
+                            locationController.currentLocation.value!.location);
+                      print(locationController.currentLocation.value!.location);
+                      if (widget.getAverageLocation != null)
+                        print(widget.getAverageLocation!());
+                      print("hello");
+                    }
+                  }
                 },
               ),
               //display all the marker chosen in the marker list
@@ -423,11 +451,15 @@ class _MapContainerState extends State<MapContainer> {
       ///button to convert the current location into a marker
       CurrentLocationMarkerButton(
         locationFunction: currentLocationAsMarker,
+        currentlyMarkingGetter: widget.currentlyMarkingGetter!,
+        currentlyMarkingSetter: widget.currentlyMarkingSetter!,
       ),
 
       ///button to delete the markers
       DeleteButton(
-          featureTypeToDelete: "all markers", deleteFunction: deleteAllMarker)
+        featureTypeToDelete: "all markers",
+        deleteFunction: deleteAllMarker,
+      )
     ];
   }
 

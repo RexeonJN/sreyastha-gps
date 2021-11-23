@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sreyastha_gps/app/core/constants/all_files.dart';
 import 'package:sreyastha_gps/app/data/enums/feature.dart';
-import 'package:sreyastha_gps/app/data/models/file_details.dart';
+
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_list.dart';
 import 'package:sreyastha_gps/app/modules/add_route/models/route_item.dart';
 import 'package:sreyastha_gps/app/modules/add_track/models/track_item.dart';
@@ -43,6 +43,10 @@ class StorageController extends GetxController {
     ///necessary folders required for all the files
     Future.delayed(Duration(seconds: 1)).then((value) async {
       if (await requestStoragePermissions(Permission.storage)) createFolders();
+    }).then((value) {
+      ///after the folders are created then the all saved files can be
+      ///initialised
+      retrieveFileData();
     });
   }
 
@@ -76,15 +80,15 @@ class StorageController extends GetxController {
     }
 
     ///Sreyastha GPS is in same directory in which there is Android folder
-    mainDirectory = Directory(newPath + "/SreyathaGPS");
+    mainDirectory = Directory(newPath + "/SreyasthaGPS");
     _createDirectory(mainDirectory!);
 
     ///After the main folder is created, then all the sub folders are created
-    markerDirectory = Directory(newPath + "/SreyathaGPS/Markers");
+    markerDirectory = Directory(newPath + "/SreyasthaGPS/Markers");
     _createDirectory(markerDirectory!);
-    routeDirectory = Directory(newPath + "/SreyathaGPS/Routes");
+    routeDirectory = Directory(newPath + "/SreyasthaGPS/Routes");
     _createDirectory(routeDirectory!);
-    trackDirectory = Directory(newPath + "/SreyathaGPS/Tracks");
+    trackDirectory = Directory(newPath + "/SreyasthaGPS/Tracks");
     _createDirectory(trackDirectory!);
   }
 
@@ -128,15 +132,16 @@ class StorageController extends GetxController {
       file!.writeAsString(csvMarkerData);
 
       ///add the region in the file_lists
-      ALL_FILES["Markers"]!.putIfAbsent(
+      ALL_SAVED_FILES_FROM_THE_APP["Markers"]!.putIfAbsent(
         finalPath,
-        () => FileDetails(
-          filename: filename,
-          created: DateTime.now(),
-          feature: Feature.Marker,
-          path: finalPath,
-        ),
+        () => {
+          "filename": filename,
+          "feature": returnFeatureAsString(Feature.Marker),
+          "created": DateTime.now().toString(),
+          "path": finalPath
+        },
       );
+      updateFileData();
     } catch (e) {}
   }
 
@@ -191,7 +196,10 @@ class StorageController extends GetxController {
       }
       return Future.value(true);
     } catch (e) {
-      ALL_FILES["Markers"]!.removeWhere((key, value) => key == path);
+      ALL_SAVED_FILES_FROM_THE_APP["Markers"]!
+          .removeWhere((key, value) => key == path);
+      updateFileData();
+
       return Future.value(false);
     }
   }
@@ -215,15 +223,16 @@ class StorageController extends GetxController {
       file!.writeAsString(csvTrackData);
 
       ///add the track in the file_lists
-      ALL_FILES["Tracks"]!.putIfAbsent(
+      ALL_SAVED_FILES_FROM_THE_APP["Tracks"]!.putIfAbsent(
         finalPath,
-        () => FileDetails(
-          filename: filename,
-          created: DateTime.now(),
-          feature: Feature.Track,
-          path: finalPath,
-        ),
+        () => {
+          "filename": filename,
+          "feature": returnFeatureAsString(Feature.Track),
+          "created": DateTime.now().toString(),
+          "path": finalPath
+        },
       );
+      updateFileData();
     } catch (e) {}
   }
 
@@ -272,8 +281,9 @@ class StorageController extends GetxController {
       }
       return Future.value(true);
     } catch (e) {
-      print(e);
-      ALL_FILES["Tracks"]!.removeWhere((key, value) => key == path);
+      ALL_SAVED_FILES_FROM_THE_APP["Tracks"]!
+          .removeWhere((key, value) => key == path);
+      updateFileData();
       return Future.value(false);
     }
   }
@@ -308,15 +318,16 @@ class StorageController extends GetxController {
       file!.writeAsString(csvRouteData);
 
       ///add the track in the file_lists
-      ALL_FILES["Routes"]!.putIfAbsent(
+      ALL_SAVED_FILES_FROM_THE_APP["Routes"]!.putIfAbsent(
         finalPath,
-        () => FileDetails(
-          filename: filename,
-          created: DateTime.now(),
-          feature: Feature.Route,
-          path: finalPath,
-        ),
+        () => {
+          "filename": filename,
+          "feature": returnFeatureAsString(Feature.Route),
+          "created": DateTime.now().toString(),
+          "path": finalPath
+        },
       );
+      updateFileData();
     } catch (e) {}
   }
 
@@ -368,8 +379,9 @@ class StorageController extends GetxController {
       }
       return Future.value(true);
     } catch (e) {
-      print(e);
-      ALL_FILES["Routes"]!.removeWhere((key, value) => key == path);
+      ALL_SAVED_FILES_FROM_THE_APP["Routes"]!
+          .removeWhere((key, value) => key == path);
+      updateFileData();
       return Future.value(false);
     }
   }
