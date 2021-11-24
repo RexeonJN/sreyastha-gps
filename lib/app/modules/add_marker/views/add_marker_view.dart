@@ -56,8 +56,6 @@ class AddMarkerView extends GetView<AddMarkerController> {
       body: Obx(
         ///until the controller is defined or the value of current location
         ///is available a circular progress indicator is shown
-        ///
-        ///TODO:add a button which will only be shown if you login
         () => controller.currentLocation.value != null
             ? Stack(
                 children: [

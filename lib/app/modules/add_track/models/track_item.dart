@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
+import 'package:sreyastha_gps/app/core/constants/settings.dart';
 import 'package:sreyastha_gps/app/data/enums/interval_type.dart';
 import 'package:sreyastha_gps/app/data/models/latlng_data.dart';
 
@@ -38,7 +39,12 @@ class TrackItem {
     ///timer is used to make consistent gap in time for time as interval
     if (typeOfInterval == IntervalType.ByTime) {
       if ((_timer != null && !_timer!.isActive) || _timer == null) {
-        _timer = Timer(Duration(seconds: 4), () {
+        _timer = Timer(
+            Duration(
+                seconds: SETTINGS["timeInterval"] != null &&
+                        int.tryParse(SETTINGS["timeInterval"]!) != null
+                    ? int.parse(SETTINGS["timeInterval"]!)
+                    : 5), () {
           if (_timer != null &&
               locationController.currentLocation.value != null) {
             pointsInTrack.value.add(
@@ -56,7 +62,10 @@ class TrackItem {
             locationController.currentLocation.value!.location.latitude,
             locationController.currentLocation.value!.location.longitude,
           ) >
-          2) {
+          (SETTINGS["distanceInterval"] != null &&
+                  int.tryParse(SETTINGS["distanceInterval"]!) != null
+              ? int.parse(SETTINGS["distanceInterval"]!)
+              : 5)) {
         pointsInTrack.value.add(
           locationController.currentLocation.value!,
         );

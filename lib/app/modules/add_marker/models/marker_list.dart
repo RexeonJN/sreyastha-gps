@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
+import 'package:sreyastha_gps/app/core/constants/settings.dart';
 import 'package:sreyastha_gps/app/data/enums/marker_input_type.dart';
 import 'package:sreyastha_gps/app/data/models/latlng_data.dart';
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
@@ -76,7 +77,7 @@ class MarkerList {
       double? altitude, double? accuracy) {
     markerItem = MarkerItem(
       id: _counter,
-      name: 'Mark' + (_counter).toString(),
+      name: SETTINGS["defaultMarkerName"]! + (_counter).toString(),
       marker: _defaultMarker(markerPoint, _counter, onTapped, markerType),
       location: LatlngData(
         location: markerPoint,

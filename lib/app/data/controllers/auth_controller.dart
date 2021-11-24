@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sreyastha_gps/app/core/constants/settings.dart';
 import 'package:sreyastha_gps/app/data/exceptions/http_exception.dart';
 
 class AuthController extends GetxController {
@@ -191,6 +192,8 @@ class AuthController extends GetxController {
     }
     final prefs = await SharedPreferences.getInstance();
     prefs.remove("userData");
+
+    SETTINGS["corrections"] = "unabled";
   }
 
   ///whenever we move out of the app we logout automatically

@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sreyastha_gps/app/core/constants/all_files.dart';
+import 'package:sreyastha_gps/app/core/constants/settings.dart';
 import 'package:sreyastha_gps/app/data/enums/feature.dart';
 
 import 'package:sreyastha_gps/app/modules/add_marker/models/marker_list.dart';
@@ -80,15 +81,18 @@ class StorageController extends GetxController {
     }
 
     ///Sreyastha GPS is in same directory in which there is Android folder
-    mainDirectory = Directory(newPath + "/SreyasthaGPS");
+    mainDirectory = Directory(newPath + SETTINGS["parentPathName"]!);
     _createDirectory(mainDirectory!);
 
     ///After the main folder is created, then all the sub folders are created
-    markerDirectory = Directory(newPath + "/SreyasthaGPS/Markers");
+    markerDirectory =
+        Directory(newPath + SETTINGS["parentPathName"]! + "/Markers");
     _createDirectory(markerDirectory!);
-    routeDirectory = Directory(newPath + "/SreyasthaGPS/Routes");
+    routeDirectory =
+        Directory(newPath + SETTINGS["parentPathName"]! + "/Routes");
     _createDirectory(routeDirectory!);
-    trackDirectory = Directory(newPath + "/SreyasthaGPS/Tracks");
+    trackDirectory =
+        Directory(newPath + SETTINGS["parentPathName"]! + "/Tracks");
     _createDirectory(trackDirectory!);
   }
 

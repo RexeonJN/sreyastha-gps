@@ -1,8 +1,9 @@
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
+import 'package:sreyastha_gps/app/core/constants/settings.dart';
 import 'package:sreyastha_gps/app/data/controllers/non_getx_controllers/custom_map_controller.dart';
+import 'package:sreyastha_gps/app/data/enums/record_profile.dart';
 import 'package:sreyastha_gps/app/data/models/latlng_data.dart';
 import 'package:sreyastha_gps/app/modules/add_track/models/track_item.dart';
 
@@ -60,7 +61,8 @@ class AddTrackController extends GetxController {
 
   void startTracking() async {
     if (await locationController.requestPermissions()) {
-      locationController.subscribePosition(LocationAccuracy.best);
+      locationController.subscribePosition(getLocationAccuracyFromRecordProfile(
+          getRecordProfileFromString(SETTINGS["recordProfile"]!)));
     }
   }
 

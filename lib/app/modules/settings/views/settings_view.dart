@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sreyastha_gps/app/core/themes/colors.dart';
-import 'package:sreyastha_gps/app/modules/settings/widgets/display_tab.dart';
 import 'package:sreyastha_gps/app/modules/settings/widgets/record_tab.dart';
 import 'package:sreyastha_gps/app/modules/settings/widgets/storage_tab.dart';
 
@@ -21,7 +20,7 @@ class SettingsView extends GetView<SettingsController> {
 
     return DefaultTabController(
       initialIndex: controller.currentIndex.value,
-      length: 3,
+      length: 2,
       child: Scaffold(
           appBar: AppBar(
             backgroundColor: light,
@@ -40,7 +39,7 @@ class SettingsView extends GetView<SettingsController> {
               ),
             ),
             bottom: TabBar(
-              tabs: ["Record", "Display", "Storage"]
+              tabs: ["Record", "Storage"]
                   .map((String name) => Tab(
                         child: Text(
                           name,
@@ -53,7 +52,6 @@ class SettingsView extends GetView<SettingsController> {
           body: TabBarView(
             children: [
               RecordTab(),
-              DisplayTab(),
               StorageTab(),
             ],
           )),
