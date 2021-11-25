@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:sreyastha_gps/app/core/constants/controllers.dart';
+import 'package:sreyastha_gps/app/core/values/keys.dart';
 import 'package:sreyastha_gps/app/routes/app_pages.dart';
 
 class PaymentController extends GetxController {
@@ -40,7 +41,7 @@ class PaymentController extends GetxController {
     ///options contains the settings which  will be shown on clicking the
     ///payment button
     var options = {
-      "key": "rzp_test_U5YVfabNOHjkVg",
+      "key": RAZORPAY_KEYS["key_id"],
       "amount": type == "monthly" ? 2000 : 20000,
       "name": "Sample App",
       "order_id": orderId,
